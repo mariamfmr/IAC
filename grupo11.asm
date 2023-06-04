@@ -709,11 +709,22 @@ ativa_missil_3:
 	JMP fim_chama_comando
 
 ; ******************************************************************************
+; testa_limites_missil - Testa a posição do missil atual e vê se ultrapassou os
+;						 limites do ecrã ou se ocorreu um choque.
+;
+; Argumentos: R1 - valor da linha atual 
+;			  R2 - valor da coluna atual
+;			  R3 - direção em que vai descer
+; ******************************************************************************
+testa_limites_missil:
+	
+
+; ******************************************************************************
 ; move_missil - Move os misseis ativos uma linha para cima consoante a sua 
 ;				direção:
-;				- Direita:
-;				- Esquerda:
-;				- Meio:
+;				- Direita: Uma linha para cima e duas colunas para a direita
+;				- Esquerda: Uma linha para cima e duas colunas para a esquerda
+;				- Meio: Uma linha para cima
 ; ******************************************************************************
 move_misseis:
 	CALL apaga_missil_1                 ; apaga o missil na posição antiga
@@ -725,6 +736,8 @@ move_misseis:
 
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
+
+	CALL testa_limites_missil
 
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas

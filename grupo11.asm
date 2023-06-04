@@ -726,8 +726,6 @@ move_misseis:
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
 
-	CALL testa_choques
-
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
 	MOV [POS_MISSIL_1+4], R3			; atualiza valor do estado

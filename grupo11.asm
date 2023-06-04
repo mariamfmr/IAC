@@ -717,8 +717,18 @@ ativa_missil_3:
 ;			  R3 - direção em que o missil vai subir
 ; ******************************************************************************
 testa_limites_missil:
+
+	; obter coordenadas da bomba 1
+	MOV R4, [POS_BOMBA_1]
+	MOV R5, [POS_BOMBA_1+2]
+
+	SUB R4, R1
+	SUB R5, R2
+
+	
+testa_limites_ecrã
 	MOV R6, -1					; valor do  limite esquerdo	
-	CMP R5, R2					; ver se o missil ultrapassou esse limite		
+	CMP R6, R2					; ver se o missil ultrapassou esse limite		
 	JZ reset_missil				; se sim, repõe-o
 
 	MOV R6, 64					; valor do  limite direito	

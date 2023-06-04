@@ -8,5 +8,5 @@ Este jogo permite através do teclado:
 - 0: lançar um míssil para a esquerda
 - 2: lançar um míssil para a direita
 - 5: lançar um míssil para cima
-- E: trocar de personagem:
+- E: trocar de personagem
 - F: acabar o jogo

@@ -709,24 +709,6 @@ ativa_missil_3:
 	JMP fim_chama_comando
 
 ; ******************************************************************************
-; houve_choque - Testa a posição do missil atual e vê se ultrapassou os
-;				 limites do ecrã ou se ocorreu um choque.
-;
-; Argumentos: R1 - valor da linha atual do missil
-;			  R2 - valor da coluna atual do missil
-;			  R3 - estado atual do missil 
-;			  R4 - linha atual da bomba a com que houve choque
-;			  R4 - coluna atual da bomba a com que houve choque
-;
-; ******************************************************************************
-houve_choque:
-	MOV R4, LINHA_BOMBA_MEIO
-	MOV R5, COLUNA_BOMBA_MEIO
-	MOV R1, LINHA_MISSIL
-	MOV R2, COLUNA_MISSIL
-	MOV R3, -1
-
-; ******************************************************************************
 ; testa_limites_missil - Testa a posição do missil atual e vê se ultrapassou os
 ;						 limites do ecrã ou se ocorreu um choque.
 ;
@@ -739,13 +721,145 @@ testa_limites_missil:
 	CMP R6, R2					; ver se o missil ultrapassou esse limite		
 	JZ reset_missil				; se sim, repõe-o
 
-	MOV R6, 64					; valor do  limite direito	
+	MOV R6, 64					; valor do limite direito	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite		
 	JZ reset_missil				; se sim, repõe-o
 
-	MOV R6, 0
+	MOV R6, 0					; valor do limite superios
+	CMP R6, R1					; ver se o missil ultrapassou esse limite		
+	JZ reset_missil				; se sim, repõe-o
+	
+testa_choque_1:					; testa choque com a bomba 1
+	MOV R5, [POS_BOMBA_1]		; obtem linha bomba 1 (limite superior)
+	MOV R6, R5
+	ADD R6, 3					; obtem limite inferior da bomba 1
+	MOV R7, [POS_BOMBA_1+2]		; obtem coluna bomba 1 (limite esquerdo)
+	MOV R8, R7					
+	ADD R8, 3					; obtem limite direito da bomba 1
+
+	; ver se o missil está dentro dos limites da linha da bomba
+	CMP R5, R1					
+	JGT testa_choque_2
 	CMP R6, R1
-	JZ reset_missil
+	JLT testa_choque_2
+
+	; ver se o missil esta dentro dos limites da coluna da bomba
+	CMP R7, R2
+	JGT testa_choque_2
+	CMP R8, R2
+	JLT testa_choque_2			; se não estiver, testa-se o choque com a bomba 2
+
+	CALL apaga_bomba_1
+	CALL apaga_missil_1
+
+	MOV R4, LINHA_BOMBA_MEIO
+	MOV R5, COLUNA_BOMBA_MEIO
+	MOV R1, LINHA_MISSIL
+	MOV R2, COLUNA_MISSIL
+	MOV R3, -1
+
+	MOV [POS_BOMBA_1], R4
+	MOV [POS_BOMBA_1+2], R5
+	RET
+
+testa_choque_2:					; testa choque com a bomba 2
+	MOV R5, [POS_BOMBA_2]		; obtem linha bomba 2
+	MOV R6, R5
+	ADD R6, 3					; obtem limite inferior da bomba 2
+	MOV R7, [POS_BOMBA_2+2]		; obtem coluna bomba 2
+	MOV R8, R7
+	ADD R8, 3					; obtem limite direito da bomba 2
+
+	; ver se o missil está dentro dos limites da linha da bomba
+	CMP R5, R1
+	JGT testa_choque_3
+	CMP R6, R1
+	JLT testa_choque_3
+
+	; ver se o missil esta dentro dos limites da coluna da bomba
+	CMP R7, R2
+	JGT testa_choque_3
+	CMP R8, R2
+	JLT testa_choque_3			; se não estiver, testa-se o choque com a bomba 3
+
+	CALL apaga_bomba_2
+	CALL apaga_missil_1
+
+	MOV R4, LINHA_BOMBA_MEIO
+	MOV R5, COLUNA_BOMBA_MEIO
+	MOV R1, LINHA_MISSIL
+	MOV R2, COLUNA_MISSIL
+	MOV R3, -1
+
+	MOV [POS_BOMBA_2], R4
+	MOV [POS_BOMBA_2+2], R5
+	RET
+
+testa_choque_3:					; testa choque com a bomba 3
+	MOV R5, [POS_BOMBA_3]		; obtem linha bomba 3
+	MOV R6, R5
+	ADD R6, 3					; obtem limite inferior da bomba 3
+	MOV R7, [POS_BOMBA_3+2]		; obtem coluna bomba 3
+	MOV R8, R7
+	ADD R8, 3					; obtem limite direito da bomba 3
+
+	; ver se o missil está dentro dos limites da linha da bomba
+	CMP R5, R1
+	JGT testa_choque_4
+	CMP R6, R1
+	JLT testa_choque_4
+
+	; ver se o missil esta dentro dos limites da coluna da bomba
+	CMP R7, R2
+	JGT testa_choque_4
+	CMP R8, R2
+	JLT testa_choque_4			; se não estiver, testa-se o choque com a bomba 4
+
+	CALL apaga_bomba_3
+
+	MOV R4, LINHA_BOMBA_MEIO
+	MOV R5, COLUNA_BOMBA_MEIO
+	MOV R1, LINHA_MISSIL
+	MOV R2, COLUNA_MISSIL
+	MOV R3, -1
+
+	MOV [POS_BOMBA_3], R4
+	MOV [POS_BOMBA_3+2], R5
+	RET
+
+testa_choque_4:					; testa choque com a bomba 4
+	MOV R5, [POS_BOMBA_4]		; obtem linha bomba 4
+	MOV R6, R5
+	ADD R6, 3					; obtem limite inferior da bomba 4
+	MOV R7, [POS_BOMBA_4+2]		; obtem coluna bomba 4
+	MOV R8, R7
+	ADD R8, 3					; obtem limite direito da bomba 4
+
+	; ver se o missil está dentro dos limites da linha da bomba
+	CMP R5, R1
+	JGT fim_limites_missil
+	CMP R6, R1
+	JLT fim_limites_missil
+
+	; ver se o missil esta dentro dos limites da coluna da bomba
+	CMP R7, R2
+	JGT fim_limites_missil		
+	CMP R8, R2
+	JLT fim_limites_missil		; se não estiver, ja se testou todos os limites 
+
+	CALL apaga_bomba_4
+
+	MOV R4, LINHA_BOMBA_MEIO
+	MOV R5, COLUNA_BOMBA_MEIO
+	MOV R1, LINHA_MISSIL
+	MOV R2, COLUNA_MISSIL
+	MOV R3, -1
+
+	MOV [POS_BOMBA_4], R4
+	MOV [POS_BOMBA_4+2], R5
+	RET
+
+fim_limites_missil:
 	RET
 
 reset_missil:
@@ -951,13 +1065,14 @@ limites_direitos:						; limites de bombas que caminham
 	MOV R5, 60							; testar limite inferior direito
 	CMP R5, R2
 	JZ reset_bomba
-	MOV R5, 19							; testar choque com personagem
+	MOV R5, 18							; testar choque com personagem
 	CMP R5, R1							; ver se ultrapassou a linha da personagem
 	JNZ fim_limites_bomba				; se não, avança
-	MOV R5, 21							; testa coluna da bomba para saber se houve
+	MOV R5, 20							; testa coluna da bomba para saber se houve
 										; choque
 	CMP R5, R2
-	JZ reset_bomba						; se sim, dá reset à bomba
+	JNZ fim_limites_bomba
+	JMP reset_bomba						; se sim, dá reset à bomba
 	JMP fim_limites_bomba
 
 limites_meio:							; limites de bombas que caminham para baixo

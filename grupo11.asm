@@ -182,6 +182,9 @@ INT_ENERGIA:                            ; variável que indica se se tem de
                                         ; diminuir a energia da nave
 	WORD 0                              ; 1 - sim, 0 - não
 
+INT_BOMBAS:								; variável que indica se se tem de
+                                        ; mover as bombas
+	WORD 0                              ; 1 - sim, 0 - não
 COR_ARMA:                               ; variavel que armazena qual a cor atual 
                                         ; da arma
 	WORD CINZENTO                       
@@ -365,7 +368,7 @@ CALL desenha_rapaz                      ; desenha personagem inicial (rapaz)
 ciclo:
 	CALL teclado                        ; verifica se alguma tecla foi carregada
 	CALL chama_comando                  ; chama o comando consoante tecla teclada
-    MOV R2, DELAY
+	CALL move_bombas
 	JMP ciclo
 
 ; *********************************************************************************
@@ -421,14 +424,9 @@ comandos_jogo_acabado:
 comandos_decorrer_jogo:
 	MOV R1, 0
 	CMP R1, R0							; compara a tecla com a tecla 0
-	JNZ testa_move_bombas
-	JMP atira_missil_esquerda			; se forem iguais, atira um missil
-										; para a esquerda
-testa_move_bombas:
-	MOV R1, 1
-	CMP R1, R0				            ; compara tecla primida com a tecla 0 
 	JNZ testa_missil_direita
-    JMP move_bombas			            ; se forem iguais, move a bomba
+	JMP atira_missil_esquerda			; se forem iguais, atira um missil
+										; para a esquerda	            
  
  testa_missil_direita:
 	MOV R1, 2
@@ -488,6 +486,7 @@ rot_int_arma:
 ; rot_int_1 - Rotina de atendimento da interrupção 1.
 ; ******************************************************************************
 rot_int_1:
+	CALL assinala_int_bombas
     RFE
 
 ; ******************************************************************************
@@ -503,16 +502,19 @@ rot_int_3:
     RFE
 
 ; ******************************************************************************
-; atraso - Espera algum tempo.
+; assinala_int_bombas - Assinala uma interrupção .
 ;
-; Argumentos: R2 - Valor a usar no contador para atraso.
+; Argumentos: R0 - Variável INT_BOMBAS que varia entre 0 e 1.
 ; ******************************************************************************
-atraso:
-	PUSH R2
-	continua:
-	SUB R2, 1
-	JNZ continua
-	POP R2
+
+assinala_int_bombas:
+	PUSH R0
+    PUSH R1
+    MOV  R0, INT_BOMBAS
+    MOV  R1, 1                   ; assinala que houve uma interrupção
+    MOV  [R0], R1
+    POP  R1
+    POP  R0
 	RET
 
 ; ******************************************************************************
@@ -949,6 +951,21 @@ sai_move_misseis:
 ;				- Meio: desce uma linha.
 ; ******************************************************************************
 move_bombas:
+	PUSH R0
+    PUSH R1
+	MOV R0, [ESTADO_JOGO]				; obtem estado de jogo
+	MOV R1, JOGO_EM_CURSO
+	CMP R0, R1							; verifica se jogo está em curso
+	JNZ sai_move_bombas					; se não, sai 
+
+    MOV R0, INT_BOMBAS    				; verifica se houve interrupção para mover as bombas
+	MOV R0, [R0]
+	CMP R0, 0
+	JZ sai_move_bombas					; se não, sai
+
+	MOV R0, INT_BOMBAS					;assinala a interrupção de volta a zero
+	MOV R1, 0
+	MOV [R0], R1
 	CALL apaga_bomba_1                  ; apaga a bomba na posição antiga
 	MOV R1, [POS_BOMBA_1]				; obtem linha atual
 	MOV R2, [POS_BOMBA_1+2]             ; obtem coluna atual
@@ -1032,7 +1049,9 @@ move_bomba_4:
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
 
 sai_move_bombas:
-	JMP fim_chama_comando
+	POP R1 
+	POP R0 
+	RET
 
 ; ******************************************************************************
 ; testa_limites_bombas - Avalia a posição das bombas e vê se ultrapassou os 
@@ -1427,7 +1446,6 @@ desenha_arma:
 	MOV R1, [POS_ARMA]                  ; obtem linha da arma
 	MOV R2, [POS_ARMA+2]                ; obtem coluna da arma
 	MOV R4, DEF_ARMA_CINZENTA           ; obtem definição da arma cinzenta
-    CALL atraso
 	CALL desenha_boneco
 
     MOV R1, CINZENTO                    
@@ -1440,7 +1458,6 @@ muda_arma_branco:
 	MOV R1, [POS_ARMA]                  ; obtem linha da arma
 	MOV R2, [POS_ARMA+2]                ; obtem coluna da arma
 	MOV R4, DEF_ARMA_BRANCA             ; obtem definição da arma branca
-    CALL atraso
 	CALL desenha_boneco
     MOV R1, BRANCO                  
     MOV [COR_ARMA], R1                  ; atualiza a cor da arma para branco

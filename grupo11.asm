@@ -749,17 +749,17 @@ testa_choque_1:					; testa choque com a bomba 1
 	CMP R8, R2
 	JLT testa_choque_2			; se não estiver, testa-se o choque com a bomba 2
 
-	CALL apaga_bomba_1
-	CALL apaga_missil_1
+	CALL apaga_bomba_1			; apaga a bomba que sofreu um choque
+	CALL apaga_missil_1			; apaga o missil que sofreu o choque
 
-	MOV R4, LINHA_BOMBA_MEIO
-	MOV R5, COLUNA_BOMBA_MEIO
-	MOV R1, LINHA_MISSIL
-	MOV R2, COLUNA_MISSIL
+	MOV R4, LINHA_BOMBA_MEIO	; repoe linha da bomba
+	MOV R5, COLUNA_BOMBA_MEIO	; repoe coluna da bomba
+	MOV R1, LINHA_MISSIL		; repoe linha do missil
+	MOV R2, COLUNA_MISSIL		; repoe coluna do missil
 	MOV R3, -1
 
-	MOV [POS_BOMBA_1], R4
-	MOV [POS_BOMBA_1+2], R5
+	MOV [POS_BOMBA_1], R4		; atualiza linha bomba
+	MOV [POS_BOMBA_1+2], R5		; atualiza coluna bomba
 	RET
 
 testa_choque_2:					; testa choque com a bomba 2

@@ -709,6 +709,24 @@ ativa_missil_3:
 	JMP fim_chama_comando
 
 ; ******************************************************************************
+; houve_choque - Testa a posição do missil atual e vê se ultrapassou os
+;				 limites do ecrã ou se ocorreu um choque.
+;
+; Argumentos: R1 - valor da linha atual do missil
+;			  R2 - valor da coluna atual do missil
+;			  R3 - estado atual do missil 
+;			  R4 - linha atual da bomba a com que houve choque
+;			  R4 - coluna atual da bomba a com que houve choque
+;
+; ******************************************************************************
+houve_choque:
+	MOV R4, LINHA_BOMBA_MEIO
+	MOV R5, COLUNA_BOMBA_MEIO
+	MOV R1, LINHA_MISSIL
+	MOV R2, COLUNA_MISSIL
+	MOV R3, -1
+
+; ******************************************************************************
 ; testa_limites_missil - Testa a posição do missil atual e vê se ultrapassou os
 ;						 limites do ecrã ou se ocorreu um choque.
 ;
@@ -717,16 +735,6 @@ ativa_missil_3:
 ;			  R3 - direção em que o missil vai subir
 ; ******************************************************************************
 testa_limites_missil:
-
-	; obter coordenadas da bomba 1
-	MOV R4, [POS_BOMBA_1]
-	MOV R5, [POS_BOMBA_1+2]
-
-	SUB R4, R1
-	SUB R5, R2
-
-	
-testa_limites_ecrã
 	MOV R6, -1					; valor do  limite esquerdo	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite		
 	JZ reset_missil				; se sim, repõe-o

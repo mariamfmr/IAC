@@ -712,12 +712,29 @@ ativa_missil_3:
 ; testa_limites_missil - Testa a posição do missil atual e vê se ultrapassou os
 ;						 limites do ecrã ou se ocorreu um choque.
 ;
-; Argumentos: R1 - valor da linha atual 
-;			  R2 - valor da coluna atual
-;			  R3 - direção em que vai descer
+; Argumentos: R1 - valor da linha atual do missil
+;			  R2 - valor da coluna atual do missil
+;			  R3 - direção em que o missil vai subir
 ; ******************************************************************************
 testa_limites_missil:
-	
+	MOV R6, -1					; valor do  limite esquerdo	
+	CMP R5, R2					; ver se o missil ultrapassou esse limite		
+	JZ reset_missil				; se sim, repõe-o
+
+	MOV R6, 64					; valor do  limite direito	
+	CMP R6, R2					; ver se o missil ultrapassou esse limite		
+	JZ reset_missil				; se sim, repõe-o
+
+	MOV R6, 0
+	CMP R6, R1
+	JZ reset_missil
+	RET
+
+reset_missil:
+	MOV R1, LINHA_MISSIL		; repor linha do missil 
+	MOV R2, COLUNA_MISSIL		; repor coluna do missil
+	MOV R3, -1					; repor estado do missil a parado (-1)
+	RET
 
 ; ******************************************************************************
 ; move_missil - Move os misseis ativos uma linha para cima consoante a sua 
@@ -737,13 +754,13 @@ move_misseis:
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
 
+	CALL reproduz_som	                ; reproduz som do missil
+
 	CALL testa_limites_missil
 
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
-	MOV [POS_MISSIL_1+4], R3			; atualiza valor do estado
-
-	CALL reproduz_som	                ; reproduz som do missil
+	MOV [POS_MISSIL_1+4], R3            ; atualiza estado do missil
 
 	CALL desenha_missil_1               ; desenha missil na nova posição
 
@@ -760,6 +777,12 @@ move_missel_2:
 
 	CALL reproduz_som	                ; reproduz som do missil
 
+	CALL testa_limites_missil
+
+	MOV [POS_MISSIL_2], R1              ; atualiza valor da linha
+	MOV [POS_MISSIL_2+2], R2            ; atualiza valor da colunas
+	MOV [POS_MISSIL_2+4], R3            ; atualiza estado do missil
+
 	CALL desenha_missil_2               ; desenha missil na nova posição
 
 move_missel_3:
@@ -774,6 +797,12 @@ move_missel_3:
 	MOV [POS_MISSIL_3+2], R2            ; atualiza valor da colunas
 
 	CALL reproduz_som	                ; reproduz som do missil
+
+	CALL testa_limites_missil
+
+	MOV [POS_MISSIL_3], R1              ; atualiza valor da linha
+	MOV [POS_MISSIL_3+2], R2            ; atualiza valor da colunas
+	MOV [POS_MISSIL_3+4], R3            ; atualiza estado do missil
 
 	CALL desenha_missil_3               ; desenha missil na nova posição
 

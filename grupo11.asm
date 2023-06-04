@@ -398,6 +398,7 @@ chama_comando:
 	PUSH R5
 	PUSH R6
 	PUSH R7
+	PUSH R8
     MOV R0, [DEF_TECLA]                 ; obtem tecla carregada       
 	MOV R2, [DEF_TECLA+2] 	            ; obtem tecla anterior à carregada
 	CMP R2, R0 				            ; vê se é a mesma tecla
@@ -465,6 +466,7 @@ testa_acaba_jogo:
 	JMP acaba_jogo                      ; se forem iguais, acaba o jogo
 
 fim_chama_comando:
+	POP R8
 	POP R7
 	POP R6
 	POP R5
@@ -1014,7 +1016,7 @@ move_bombas:
 
 	CALL reproduz_som	                ; reproduz som da bomba
 	
-	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
+	CALL testa_limites_bomba			; vê se a nova posição ultrapassa limites
 	MOV [POS_BOMBA_1], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_1+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_1+4], R3 			
@@ -1107,10 +1109,11 @@ testa_limites_bomba:
 	CMP R5, R2
 	JZ reset_bomba						; caso tenha ultrapassado, 
 										; dá reset à posição da bomba
-	MOV R5, 33
+	MOV R5, 34
 	CMP R5, R2							; testar choque com personagem 
-	JZ reset_bomba
-	JMP fim_limites_bomba
+	JNZ fim_limites_bomba
+	JMP perde_jogo
+	
 
 limites_direitos:						; limites de bombas que caminham 
 										; na direção direita
@@ -1127,8 +1130,7 @@ limites_direitos:						; limites de bombas que caminham
 										; choque
 	CMP R5, R2
 	JNZ fim_limites_bomba
-	JMP reset_bomba						; se sim, dá reset à bomba
-	JMP fim_limites_bomba
+	JMP perde_jogo						; se sim, dá reset à bomba
 
 limites_meio:							; limites de bombas que caminham para baixo
 	MOV R5, 18							; testar choque com personagem
@@ -1709,12 +1711,4 @@ perde_jogo:
     MOV R1, 2                           ; muda o cenário para final de jogo
                                         ; quando perdido
     MOV [SELECIONA_CENARIO], R1
-    POP R7
-	POP R6
-	POP R5
-	POP R4
-	POP R3
-	POP R2
-	POP R1
-	POP R0
 	JMP ciclo

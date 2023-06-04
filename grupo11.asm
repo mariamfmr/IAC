@@ -185,6 +185,10 @@ INT_ENERGIA:                            ; variável que indica se se tem de
 INT_BOMBAS:								; variável que indica se se tem de
                                         ; mover as bombas
 	WORD 0                              ; 1 - sim, 0 - não
+
+INT_MISSIL:							; variável que indica se se tem de
+                                        ; mover os misseis
+	WORD 0                              ; 1 - sim, 0 - não
 COR_ARMA:                               ; variavel que armazena qual a cor atual 
                                         ; da arma
 	WORD CINZENTO                       
@@ -369,6 +373,7 @@ ciclo:
 	CALL teclado                        ; verifica se alguma tecla foi carregada
 	CALL chama_comando                  ; chama o comando consoante tecla teclada
 	CALL move_bombas
+	CALL move_misseis
 	JMP ciclo
 
 ; *********************************************************************************
@@ -431,14 +436,9 @@ comandos_decorrer_jogo:
  testa_missil_direita:
 	MOV R1, 2
 	CMP R1, R0							; compara a tecla com a tecla 0
-	JNZ testa_move_misseis
+	JNZ testa_missil_cima
 	JMP atira_missil_direita			; se forem iguais, atira um missil
 										; para a direita
-testa_move_misseis:
-    MOV R1, 4				            
-	CMP R1, R0  			            ; compara tecla primida com a tecla 4 
-	JNZ testa_missil_cima
-	JMP move_misseis			        ; se forem iguais, move o missil
 
 testa_missil_cima:
 	MOV R1, 5
@@ -493,6 +493,7 @@ rot_int_1:
 ; rot_int_2 - Rotina de atendimento da interrupção 2,
 ; ******************************************************************************
 rot_int_2:
+	CALL assinala_int_missil
     RFE
     
 ; ******************************************************************************
@@ -511,6 +512,23 @@ assinala_int_bombas:
 	PUSH R0
     PUSH R1
     MOV  R0, INT_BOMBAS
+    MOV  R1, 1                   ; assinala que houve uma interrupção
+    MOV  [R0], R1
+    POP  R1
+    POP  R0
+	RET
+
+
+; ******************************************************************************
+; assinala_int_missil - Assinala uma interrupção .
+;
+; Argumentos: R0 - Variável INT_MISSIL que varia entre 0 e 1.
+; ******************************************************************************
+
+assinala_int_missil:
+	PUSH R0
+    PUSH R1
+    MOV  R0, INT_MISSIL
     MOV  R1, 1                   ; assinala que houve uma interrupção
     MOV  [R0], R1
     POP  R1
@@ -878,6 +896,22 @@ reset_missil:
 ;				- Meio: Uma linha para cima
 ; ******************************************************************************
 move_misseis:
+	PUSH R0
+	PUSH R1
+	MOV R0, [ESTADO_JOGO]				; obtem o estado do jogo
+	MOV R1, JOGO_EM_CURSO
+	CMP R0, R1 							;  se estiver em curso, continua
+	JNZ sai_move_misseis				;  se não, sai
+
+	MOV  R0, INT_MISSIL
+    MOV  R0, [R0]
+    CMP  R0, 1                  		; houve uma interrupção para mover o míssil?
+    JNZ  sai_move_misseis	    		; se não, sai
+
+	MOV R0, INT_MISSIL					; assinala a interrupção de volta a zero
+	MOV R1, 0
+	MOV [R0], R1
+
 	CALL apaga_missil_1                 ; apaga o missil na posição antiga
 	MOV R1, [POS_MISSIL_1]				; obtem linha atual
 	MOV R2, [POS_MISSIL_1+2]            ; obtem coluna atual
@@ -941,7 +975,9 @@ move_missel_3:
 	CALL desenha_missil_3               ; desenha missil na nova posição
 
 sai_move_misseis:
-	JMP fim_chama_comando
+	POP R1 
+	POP R0
+	RET
 
 ; ******************************************************************************
 ; move_bombas - Move as bombas consoante a sua direção atual:

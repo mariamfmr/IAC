@@ -597,12 +597,12 @@ reduzir_energia:
     CMP R0, 0                           ; verifica se a energia é igual a zero
     JZ sai_reduzir_energia              ; se for zero, sai sem decrementar a 
                                         ; energia
-    SUB R0, 5                           ; decrementa 5 à energia da nave
+    SUB R0, 3                           ; decrementa 5 à energia da nave
     CALL atualiza_energia               ; atualiza o valor na variável e nos 
                                         ; displays
 
 	CMP R0, 0
-	JNZ salto_2
+	JGT salto_2
 	JMP perde_jogo
 	salto_2:
 
@@ -622,7 +622,8 @@ aumentar_energia:
     MOV  R0, INT_ENERGIA
     MOV  R1, ENERGIA_BONECO             ; obtem energia atual do boneco
     MOV  R0, [R1]              
-    ADD  R0, 1                          ; decrementa a energia da nave
+	MOV R1, 25
+    ADD  R0, R1                          ; decrementa a energia da nave
     CALL atualiza_energia               ; atualiza o valor na variável e nos 
                                         ; displays
     CMP  R0, 0                          ; verifica se a energia ficou a 0
@@ -632,6 +633,28 @@ sai_aumentar_energia:
     POP R1
     POP R0
     JMP fim_chama_comando
+
+; ********************************************************************************
+; diminuir_energia_missil - Diminui a energia do boneco com cada disparo de míssil
+; ********************************************************************************
+diminuir_energia_missil:
+    PUSH R0
+    PUSH R1
+    MOV  R1, ENERGIA_BONECO             ; obtem energia atual do boneco
+    MOV  R0, [R1]              
+    SUB  R0, 5                          ; decrementa a energia da nave
+    CALL atualiza_energia               ; atualiza o valor na variável e nos 
+                                        ; displays
+    CMP  R0, 0                          ; verifica se a energia ficou a 0
+	JNZ salto_4
+	JMP perde_jogo
+	salto_4:
+    JMP sai_diminuir_energia_missil           ; se não, sai
+
+sai_diminuir_energia_missil:
+    POP R1
+    POP R0
+    RET
 
 ; ******************************************************************************
 ; atualiza_energia - Actualiza a energia da nave,
@@ -773,14 +796,17 @@ procura_missil_parado:
 								; o fim do comando
 
 ativa_missil_1:
+	CALL diminuir_energia_missil
 	MOV [POS_MISSIL_1+4], R5	; atualiza direção com valor escolhido
 	JMP fim_chama_comando
 
 ativa_missil_2:
+	CALL diminuir_energia_missil
 	MOV [POS_MISSIL_2+4], R5	; atualiza direção com valor escolhido
 	JMP fim_chama_comando
 
 ativa_missil_3:
+	CALL diminuir_energia_missil
 	MOV [POS_MISSIL_3+4], R5	; atualiza direção com valor escolhido
 	JMP fim_chama_comando
 

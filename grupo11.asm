@@ -193,6 +193,8 @@ COR_ARMA:                               ; variavel que armazena qual a cor atual
                                         ; da arma
 	WORD CINZENTO                       
 
+ENERGIA_INICIAL		EQU 100
+
 ; *********************************************************************************
 ; * Desenhos dos objectos
 ; *********************************************************************************
@@ -374,6 +376,7 @@ ciclo:
 	CALL chama_comando                  ; chama o comando consoante tecla teclada
 	CALL move_bombas
 	CALL move_misseis
+	CALL reduzir_energia
 	JMP ciclo
 
 ; *********************************************************************************
@@ -424,7 +427,9 @@ comandos_jogo_acabado:
 
 	MOV R1, 14				            ; compara tecla primida com a tecla E
 	CMP	R1, R0				            ; se forem iguais, muda a personagem
-	JZ muda_personagem
+	JNZ salto_3
+	JMP muda_personagem
+	salto_3:
 	JMP fim_chama_comando
 
 comandos_decorrer_jogo:
@@ -450,14 +455,8 @@ testa_missil_cima:
 testa_aumenta_energia:
 	MOV R1, 3
 	CMP R1, R0                          ; compara tecla primida com a tecla 3   
-	JNZ testa_reduz_energia
-	JMP aumentar_energia                 ; se forem iguais, aumenta a energia
-
-testa_reduz_energia:
-	MOV R1, 7
-	CMP R1, R0                          ; compara tecla primida com a tecla 7
 	JNZ testa_acaba_jogo
-	JMP reduzir_energia                  ; se forem iguais, diminui a energia
+	JMP aumentar_energia                 ; se forem iguais, aumenta a energia
 
 testa_acaba_jogo:
 	MOV R1, 15  
@@ -502,6 +501,7 @@ rot_int_2:
 ; rot_int_3 - Rotina de atendimento da interrupção 3.
 ; ******************************************************************************
 rot_int_3:
+	CALL assinala_int_energia
     RFE
 
 ; ******************************************************************************
@@ -538,26 +538,80 @@ assinala_int_missil:
 	RET
 
 ; ******************************************************************************
+; assinala_int_energia - Assinala uma interrupção .
+;
+; Argumentos: R0 - Variável INT_ENERGIA que varia entre 0 e 1.
+; ******************************************************************************
+
+assinala_int_energia:
+	PUSH R0
+    PUSH R1
+    MOV  R0, INT_ENERGIA
+    MOV  R1, 1                   ; assinala que houve uma interrupção
+    MOV  [R0], R1
+    POP  R1
+    POP  R0
+	RET
+
+; ******************************************************************************
+; atualiza_energia_inicial - Muda a energia do boneco para 100
+; ******************************************************************************
+atualiza_energia_inicial:
+    PUSH R0
+    PUSH R1
+    PUSH R2
+    PUSH R3
+    PUSH R4
+	MOV  R0, ENERGIA_INICIAL
+    MOV  R3, ENERGIA_BONECO
+    MOV  [R3], R0                       ; atualiza valor da energia
+    MOV  R1, 100                        ; primeiro valor do fator
+    MOV  R2, 10                         ; para dividir o fator
+    MOV  R3, 0                          ; valor a enviar para os displays
+	JMP converte
+    RET
+
+; ******************************************************************************
 ; reduzir_energia - Diminui um digito da energia (display).
 ; ******************************************************************************
 reduzir_energia:
     PUSH R0
     PUSH R1
-    MOV R0, INT_ENERGIA         
+
+	MOV R0, [ESTADO_JOGO]				; obtem estado de jogo
+	MOV R1, JOGO_EM_CURSO
+	CMP R0, R1							; verifica se jogo está em curso
+	JNZ sai_reduzir_energia				; se não, sai 
+
+    MOV R0, INT_ENERGIA
+	MOV R0, [R0]
+	CMP R0, 0
+	JZ sai_reduzir_energia				; se não, sai  
+
+
+	MOV R0, INT_ENERGIA
+	MOV R1, 0
+	MOV [R0], R1
     MOV R1, ENERGIA_BONECO              ; obtem energia atual do boneco
     MOV R0, [R1]           
     CMP R0, 0                           ; verifica se a energia é igual a zero
     JZ sai_reduzir_energia              ; se for zero, sai sem decrementar a 
                                         ; energia
-    SUB R0, 1                           ; decrementa a energia da nave
+    SUB R0, 5                           ; decrementa 5 à energia da nave
     CALL atualiza_energia               ; atualiza o valor na variável e nos 
                                         ; displays
+
+	CMP R0, 0
+	JNZ salto_2
+	JMP perde_jogo
+	salto_2:
+
     JMP sai_reduzir_energia
 
 sai_reduzir_energia:
     POP  R1
     POP  R0
-    JMP fim_chama_comando
+    RET
 
 ; ******************************************************************************
 ; aumentar_energia - Aumenta um digito da energia (display).
@@ -1214,6 +1268,7 @@ comeca_jogo:
 	MOV R4, JOGO_EM_CURSO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para em curso
 
+	CALL atualiza_energia_inicial
 	CALL desenha_missil_1
 	CALL desenha_missil_2
 	CALL desenha_missil_3

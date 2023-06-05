@@ -1066,7 +1066,7 @@ testa_choque_4:					; testa choque com a bomba 4
 	CALL apaga_bomba_4
 
 	CALL apaga_explosao					; apaga explosao anterior se existir
-	
+
 	MOV R1, [POS_BOMBA_4]
 	MOV R2, [POS_BOMBA_4+2]
 	MOV [POS_CHOQUE], R1
@@ -1432,7 +1432,7 @@ limites_direitos:						; limites de bombas que caminham
 	JMP perde_jogo						; se sim, dá reset à bomba
 
 limites_meio:							; limites de bombas que caminham para baixo
-	MOV R5, 18							; testar choque com personagem
+	MOV R5, 17							; testar choque com personagem
 	CMP R5, R1
 	JNZ fim_limites_bomba
 	JMP perde_jogo

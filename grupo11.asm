@@ -422,19 +422,28 @@ chama_comando:
 	JZ comandos_decorrer_jogo           ; se sim, verifica os comandos associados 
                                         ; a esse estado
 
+	MOV R4, JOGO_PAUSADO               
+	CMP R3, R4                          ; vê se o jogo está em curso
+	JZ comandos_jogo_pausado           ; se sim, verifica os comandos associados 
+                                        ; a esse estado
+
 comandos_jogo_acabado:
 	MOV R1, 12				            ; compara tecla primida com a tecla C
 	CMP R1, R0 
-    JNZ salto_1				       
+    JNZ testa_muda_personagem			       
 	JMP comeca_jogo                     ; se forem iguais, começa o jogo
-    salto_1:
 
+testa_muda_personagem:
 	MOV R1, 14				            ; compara tecla primida com a tecla E
 	CMP	R1, R0				            ; se forem iguais, muda a personagem
-	JNZ salto_3
+	JNZ fim_chama_comando
 	JMP muda_personagem
-	salto_3:
-	JMP fim_chama_comando
+
+comandos_jogo_pausado:
+	MOV R1, 12				            ; compara tecla primida com a tecla C
+	CMP	R1, R0				            ; se forem iguais, recomeca_jogo
+	JNZ fim_chama_comando
+	JMP recomeca_jogo
 
 comandos_decorrer_jogo:
 	MOV R1, 0
@@ -453,8 +462,14 @@ comandos_decorrer_jogo:
 testa_missil_cima:
 	MOV R1, 5
 	CMP R1, R0							; compara a tecla com a tecla 0
-	JNZ testa_acaba_jogo
+	JNZ testa_pausa_jogo
 	JMP atira_missil_cima				; se forem iguais, atira um missil
+										; para cima
+testa_pausa_jogo:
+	MOV R1, 13
+	CMP R1, R0							; compara a tecla com a tecla 0
+	JNZ testa_acaba_jogo
+	JMP pausa_jogo						; se forem iguais, atira um missil
 										; para cima
 
 testa_acaba_jogo:
@@ -1419,6 +1434,22 @@ comeca_jogo:
 	JMP fim_chama_comando
 
 ; ******************************************************************************
+; recomeca_jogo - Recomeça o jogo após pausado, mudando o estado de jogo.
+; ******************************************************************************
+recomeca_jogo:
+	MOV R4, JOGO_EM_CURSO
+	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
+	JMP fim_chama_comando
+
+; ******************************************************************************
+; pausa_jogo - Pausa o jogo, mudando o estado de jogo.
+; ******************************************************************************
+pausa_jogo:
+	MOV R4, JOGO_PAUSADO
+	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
+	JMP fim_chama_comando
+	
+; ******************************************************************************
 ; acaba_jogo - Acaba o jogo, mudando o estado de jogo, apagando os objetos do
 ;              do jogo e repondo-os na sua posição inicial.
 ; ******************************************************************************
@@ -1427,7 +1458,6 @@ acaba_jogo:
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
 	CALL apaga_bombas			        ; apaga as bombas do ecrã
 	CALL apaga_misseis			        ; apaga o missil do ecrã
-	MOV R1, 1
 
 	MOV R2, LINHA_BOMBA_ESQ		
 	MOV [POS_BOMBA_1], R2				; repor linha bomba 1 à linha inicial

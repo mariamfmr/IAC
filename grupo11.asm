@@ -175,6 +175,10 @@ POS_ARMA:
 	WORD LINHA_ARMA
 	WORD COLUNA_ARMA
 
+POS_CHOQUE:
+	WORD 0								; armazena linha do ultimo choque
+	WORD 0								; armzena coluna do ultimo choque
+
 ESTADO_PERSONAGEM:                      ; variavel que armazena qual das
                                         ; personagens foi selecionada para o jogo
 	WORD RAPAZ 			                ; valor da personagem atual
@@ -299,12 +303,26 @@ DEF_BOMBA:                              ; desenho da bomba 4x4
 				COR_VERMELHO, COR_PRETO, COR_BRANCO, COR_CINZENTO, COR_PRETO, 0, 
 				COR_PRETO, COR_PRETO, 0
 
+DEF_BOMBA_EXPLODIDA:                              ; desenho da bomba 4x4
+	WORD 		LARGURA_BOMBA
+	WORD		ALTURA_BOMBA
+	WORD		0, 0, 0, 0, 0, COR_VERMELHO, COR_VERMELHO, 
+				0, 0, COR_VERMELHO, COR_VERMELHO, 0, 0, 0, 
+				0, 0
+
 DEF_BOMBA_MINERAVEL:
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
 	WORD		0, COR_PRETO, COR_PRETO, 0, COR_PRETO, COR_VERDE, COR_BRANCO, 
 				COR_VERDE, COR_PRETO, COR_BRANCO, COR_CINZENTO, COR_PRETO, 0, 
 				COR_PRETO, COR_PRETO, 0
+
+DEF_BOMBA_MINERAVEL_EXP:                              ; desenho da bomba 4x4
+	WORD 		LARGURA_BOMBA
+	WORD		ALTURA_BOMBA
+	WORD		0, 0, 0, 0, 0, COR_VERDE, COR_VERDE, 
+				0, 0, COR_VERDE, COR_VERDE, 0, 0, 0, 
+				0, 0
 
 DEF_BOMBA_APAGADA:                      ; desenho da bomba apagada 4x4
 	WORD 		LARGURA_BOMBA
@@ -910,11 +928,19 @@ testa_choque_1:					; testa choque com a bomba 1
 	JLT testa_choque_2			; se não estiver, testa-se o choque com a bomba 2
 
 	CALL apaga_bomba_1			; apaga a bomba que sofreu um choque
-	CALL apaga_missil_1			; apaga o missil que sofreu o choque
+								; apaga o missil que sofreu o choque
 
-	MOV R4, [POS_BOMBA_1+6]
-	CMP R4, MINERAVEL
+	MOV R1, [POS_BOMBA_1]
+	MOV R2, [POS_BOMBA_1+2]
+	MOV [POS_CHOQUE], R1
+	MOV [POS_CHOQUE+2], R2
+
+	MOV R5, [POS_BOMBA_1+6]
+	CALL desenha_explosao
+
+	CMP R5, MINERAVEL
 	JNZ reset_1
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP
 	CALL aumentar_energia
 
 reset_1:						; repoe bomba e missil atingidos
@@ -947,15 +973,22 @@ testa_choque_2:					; testa choque com a bomba 2
 	CMP R8, R2
 	JLT testa_choque_3			; se não estiver, testa-se o choque com a bomba 3
 
-	MOV R4, [POS_BOMBA_2+6]
-	CMP R4, MINERAVEL
+	CALL apaga_bomba_2
+
+	MOV R1, [POS_BOMBA_2]
+	MOV R2, [POS_BOMBA_2+2]
+	MOV [POS_CHOQUE], R1
+	MOV [POS_CHOQUE+2], R2
+
+	MOV R5, [POS_BOMBA_2+6]
+	CALL desenha_explosao
+
+	CMP R5, MINERAVEL
 	JNZ reset_2
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP
 	CALL aumentar_energia
 
 reset_2:						; repoe bomba e missil atingidos
-	CALL apaga_bomba_2
-	CALL apaga_missil_1
-
 	CALL reset_bomba_2
 
 	MOV R1, LINHA_MISSIL
@@ -985,14 +1018,22 @@ testa_choque_3:					; testa choque com a bomba 3
 	CMP R8, R2
 	JLT testa_choque_4			; se não estiver, testa-se o choque com a bomba 4
 
-	MOV R4, [POS_BOMBA_3+6]
-	CMP R4, MINERAVEL
+	CALL apaga_bomba_3
+
+	MOV R1, [POS_BOMBA_3]
+	MOV R2, [POS_BOMBA_3+2]
+	MOV [POS_CHOQUE], R1
+	MOV [POS_CHOQUE+2], R2
+
+	MOV R5, [POS_BOMBA_3+6]
+	CALL desenha_explosao
+
+	CMP R5, MINERAVEL
 	JNZ reset_3
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP
 	CALL aumentar_energia
 
 reset_3:						; repoe bomba e missil atingidos
-	CALL apaga_bomba_3
-
 	CALL reset_bomba_3
 
 	MOV R1, LINHA_MISSIL
@@ -1022,14 +1063,22 @@ testa_choque_4:					; testa choque com a bomba 4
 	CMP R8, R2
 	JLT fim_limites_missil		; se não estiver, ja se testou todos os limites 
 
-	MOV R4, [POS_BOMBA_4+6]
-	CMP R4, MINERAVEL
+	CALL apaga_bomba_4
+
+	MOV R1, [POS_BOMBA_4]
+	MOV R2, [POS_BOMBA_4+2]
+	MOV [POS_CHOQUE], R1
+	MOV [POS_CHOQUE+2], R2
+
+	MOV R5, [POS_BOMBA_4+6]
+	CALL desenha_explosao
+
+	CMP R5, MINERAVEL
 	JNZ reset_4
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP
 	CALL aumentar_energia
 
 reset_4:						; repoe bomba e missil atingidos
-	CALL apaga_bomba_4
-
 	CALL reset_bomba_4
 
 	MOV R1, LINHA_MISSIL
@@ -1050,6 +1099,49 @@ reset_missil:
 	MOV R3, -1					; repor estado do missil a parado (-1)
 	POP R6
 	POP R5
+	RET
+
+desenha_explosao:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
+	MOV R1, [POS_CHOQUE]
+	MOV R2, [POS_CHOQUE+2]
+	MOV R4, DEF_BOMBA_EXPLODIDA
+	MOV R3, MINERAVEL
+	CMP R5, R3
+	JNZ desenha_explosao_fim
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP
+desenha_explosao_fim:
+	CALL desenha_boneco
+	POP R5
+	POP R4
+	POP R3
+	POP R2
+	POP R1
+	RET
+
+apaga_explosao:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	MOV R1, [POS_CHOQUE]
+	MOV R2, [POS_CHOQUE+2]
+
+	MOV R4, DEF_BOMBA_APAGADA
+	CALL desenha_boneco
+apaga_explosao_fim:
+	MOV R1, -1
+	MOV R2, -1
+	MOV [POS_CHOQUE], R1
+	MOV [POS_CHOQUE+2], R2  	; reset a posição da explosao
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
@@ -1282,6 +1374,7 @@ move_bomba_4:
 	
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
+	CALL apaga_explosao					; apaga explosao anterior se existir
 
 sai_move_bombas:
 	POP R9
@@ -1465,7 +1558,7 @@ testa_direita:
 define_estado:
 	CALL gerador_mineravel			; gera um número aleatório de 0-3 em R10	
 	MOV R9, NAO_MINERAVEL		
-	CMP R10, 0						; se o número for 0 é uma bomba mineravel
+	CMP R10, 1						; se o número for 0 é uma bomba mineravel
 	JNZ fim_reset_bomba
 	MOV R9, MINERAVEL
 fim_reset_bomba:
@@ -1563,6 +1656,7 @@ acaba_jogo:
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
 	CALL apaga_bombas			        ; apaga as bombas do ecrã
 	CALL apaga_misseis			        ; apaga o missil do ecrã
+	CALL apaga_explosao					; apaga explosao anterior se existir
 
 	MOV R2, LINHA_BOMBA_ESQ		
 	MOV [POS_BOMBA_1], R2				; repor linha bomba 1 à linha inicial
@@ -1661,7 +1755,7 @@ reproduz_som:
 
 ; ******************************************************************************
 ; gerador_mineravel - gera valores pseudo-aleatórios para escolher se uma bomba
-;					  é minerável ou não. (1-3 - não minerável ; 0 - minerável)
+;					  é minerável ou não. (0,2,3 - não minerável ; 1 - minerável)
 ; Argumentos - R10 - Número pseudo-aleatório entre 0 e 3
 ; ******************************************************************************
 gerador_mineravel:
@@ -2262,6 +2356,7 @@ perde_jogo:
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
 	CALL apaga_bombas			        ; apaga a bomba do ecrã
 	CALL apaga_misseis			        ; apaga o missil do ecrã
+	CALL apaga_explosao					; apaga explosao anterior se existir
 	MOV R1, 1
 
 	MOV R2, LINHA_BOMBA_ESQ		

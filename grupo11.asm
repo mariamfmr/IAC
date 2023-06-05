@@ -1429,25 +1429,41 @@ acaba_jogo:
 	CALL apaga_misseis			        ; apaga o missil do ecrã
 	MOV R1, 1
 
-	MOV R3, LINHA_BOMBA_ESQ		
-	MOV [POS_BOMBA_1], R3				; repor linha bomba 1 à linha inicial
+	MOV R2, LINHA_BOMBA_ESQ		
+	MOV [POS_BOMBA_1], R2				; repor linha bomba 1 à linha inicial
 	MOV R2, COLUNA_BOMBA_ESQ
 	MOV [POS_BOMBA_1+2], R2				; repor coluna bomba 1 à coluna inicial
+	MOV R2, DIREITA
+	MOV [POS_BOMBA_1+4], R2
+	MOV R2, NAO_MINERAVEL
+	MOV [POS_BOMBA_1+6], R2
 
-	MOV R3, LINHA_BOMBA_MEIO		
-	MOV [POS_BOMBA_2], R3				; repor linha bomba 2 à linha inicial
+	MOV R2, LINHA_BOMBA_MEIO		
+	MOV [POS_BOMBA_2], R2				; repor linha bomba 2 à linha inicial
 	MOV R2, COLUNA_BOMBA_MEIO
 	MOV [POS_BOMBA_2+2], R2				; repor coluna bomba 2 à coluna inicial
+	MOV R2, ESQUERDA
+	MOV [POS_BOMBA_2+4], R2
+	MOV R2, NAO_MINERAVEL
+	MOV [POS_BOMBA_2+6], R2
 
 	MOV R3, LINHA_BOMBA_MEIO			
 	MOV [POS_BOMBA_3], R3				; repor linha bomba 3 à linha inicial
 	MOV R2, COLUNA_BOMBA_MEIO
 	MOV [POS_BOMBA_3+2], R2				; repor coluna bomba 4 à coluna inicial
+	MOV R2, DIREITA
+	MOV [POS_BOMBA_3+4], R2
+	MOV R2, MINERAVEL
+	MOV [POS_BOMBA_3+6], R2
 
 	MOV R3, LINHA_BOMBA_DIR			
 	MOV [POS_BOMBA_4], R3				; repor linha bomba 3 à linha inicial
 	MOV R2, COLUNA_BOMBA_DIR
 	MOV [POS_BOMBA_4+2], R2				; repor coluna bomba 4 à coluna inicial
+	MOV R2, ESQUERDA
+	MOV [POS_BOMBA_4+4], R2
+	MOV R2,NAO_MINERAVEL
+	MOV [POS_BOMBA_4+6], R2
 
 	MOV R3, LINHA_MISSIL		
 	MOV R2, COLUNA_MISSIL
@@ -1948,25 +1964,41 @@ perde_jogo:
 	CALL apaga_misseis			        ; apaga o missil do ecrã
 	MOV R1, 1
 
-	MOV R3, LINHA_BOMBA_ESQ		
-	MOV [POS_BOMBA_1], R3				; repor linha bomba 1 à linha inicial
+	MOV R2, LINHA_BOMBA_ESQ		
+	MOV [POS_BOMBA_1], R2				; repor linha bomba 1 à linha inicial
 	MOV R2, COLUNA_BOMBA_ESQ
 	MOV [POS_BOMBA_1+2], R2				; repor coluna bomba 1 à coluna inicial
+	MOV R2, DIREITA
+	MOV [POS_BOMBA_1+4], R2
+	MOV R2, NAO_MINERAVEL
+	MOV [POS_BOMBA_1+6], R2
 
-	MOV R3, LINHA_BOMBA_MEIO		
-	MOV [POS_BOMBA_2], R3				; repor linha bomba 2 à linha inicial
+	MOV R2, LINHA_BOMBA_MEIO		
+	MOV [POS_BOMBA_2], R2				; repor linha bomba 2 à linha inicial
 	MOV R2, COLUNA_BOMBA_MEIO
 	MOV [POS_BOMBA_2+2], R2				; repor coluna bomba 2 à coluna inicial
+	MOV R2, ESQUERDA
+	MOV [POS_BOMBA_2+4], R2
+	MOV R2, NAO_MINERAVEL
+	MOV [POS_BOMBA_2+6], R2
 
 	MOV R3, LINHA_BOMBA_MEIO			
 	MOV [POS_BOMBA_3], R3				; repor linha bomba 3 à linha inicial
 	MOV R2, COLUNA_BOMBA_MEIO
 	MOV [POS_BOMBA_3+2], R2				; repor coluna bomba 4 à coluna inicial
+	MOV R2, DIREITA
+	MOV [POS_BOMBA_3+4], R2
+	MOV R2, MINERAVEL
+	MOV [POS_BOMBA_3+6], R2
 
 	MOV R3, LINHA_BOMBA_DIR			
 	MOV [POS_BOMBA_4], R3				; repor linha bomba 3 à linha inicial
 	MOV R2, COLUNA_BOMBA_DIR
 	MOV [POS_BOMBA_4+2], R2				; repor coluna bomba 4 à coluna inicial
+	MOV R2, ESQUERDA
+	MOV [POS_BOMBA_4+4], R2
+	MOV R2,NAO_MINERAVEL
+	MOV [POS_BOMBA_4+6], R2
 
 	MOV R3, LINHA_MISSIL		
 	MOV R2, COLUNA_MISSIL

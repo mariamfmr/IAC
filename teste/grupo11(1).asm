@@ -1397,15 +1397,15 @@ gerador_mineravel:
 	PUSH R1
 	MOV R0, PIN								; carrega endereço do periférico PIN 						
 	MOV R10, [R0]							; lê valor do periférico e guarda 
-	
-	MOV R0, 15
-	SHR R10, 4
-	AND R10, R0
-	ADD R10, 1
 
-	MOV R1, 4
-	DIV R10, R1 
-	MOD R10, R1
+	MOV R0, 15								; define o valor 15 (1111 em binário)
+	SHR R10, 4								; descarta os 4 bits de menor peso
+	AND R10, R0								; mantém apenas os bits de menor peso
+	ADD R10, 1								; adiciona 1 para garantir um valor entre 1 e 4
+
+	MOV R1, 4								
+	DIV R10, R1 							; divide valor por 4
+	MOD R10, R1								; guarda o resto da divisão (0 a 3)
 	
 	fim_gerador_mineravel:
 		POP R1 
@@ -1421,17 +1421,17 @@ gerador_mineravel:
 gerador_direcao:
 	PUSH R0 
 	PUSH R1
-	MOV R0, PIN 
-	MOV R11, [R0]
+	MOV R0, PIN 							; carrega endereço do periférico PIN 						
+	MOV R11, [R0]							; lê valor do periférico e guarda
 
-	MOV R0, 7
-	SHR R11, 4
-	AND R11, R0
-	ADD R11, 1
+	MOV R0, 7								; define o valor 7 (0111 em binário) em R0
+	SHR R11, 4								; descarta os 4 bits de menor peso
+	AND R11, R0								; mantém apenas os bits de menor peso
+	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
 
-	MOV R1, 3
-	DIV R11, R1 
-	MOD R11, R1
+	MOV R1, 3								
+	DIV R11, R1 							; divide valor por 3
+	MOD R11, R1								; guarda resto da divisao
 	
 	fim_gerador_direcao:
 		POP R1 

@@ -1402,15 +1402,19 @@ acaba_jogo:
 
 	MOV R3, LINHA_MISSIL		
 	MOV R2, COLUNA_MISSIL
+	MOV R4, -1
 
 	MOV [POS_MISSIL_1], R3				; repor linha missil 1 à linha inicial
 	MOV [POS_MISSIL_1+2], R2			; repor coluna missil 1 à coluna inicial
+	MOV [POS_MISSIL_1+4], R4
 	
 	MOV [POS_MISSIL_2], R3				; repor linha missil 1 à linha inicial
 	MOV [POS_MISSIL_2+2], R2			; repor coluna missil 1 à coluna inicial
-	
+	MOV [POS_MISSIL_2+4], R4
+
 	MOV [POS_MISSIL_3], R3				; repor linha missil 1 à linha inicial
 	MOV [POS_MISSIL_3+2], R2			; repor coluna missil 1 à coluna inicial
+	MOV [POS_MISSIL_3+4], R4
 
 	CALL reset_energia
 

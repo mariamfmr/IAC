@@ -93,9 +93,9 @@ JOGO_PAUSADO		EQU 2               ; estado de quando o jogo está pausado
 
 tabela_interrupções:      
     WORD rot_int_arma                   ; interrupção 0 - relógio muda cor da arma
-    WORD rot_int_1                      ; interrupção 1 
-    WORD rot_int_2                      ; interrupção 2 
-    WORD rot_int_3                      ; interrupção 3
+    WORD rot_int_bombas                 ; interrupção 1 - relógio que move bombas
+    WORD rot_int_missil                 ; interrupção 2 - relógio que move misséis 
+    WORD rot_int_energia                ; interrupção 3	- relógio que decrementa energia
 
 palete:                                 ; valores de cores para o desenho de 
                                         ; objetos
@@ -506,21 +506,21 @@ rot_int_arma:
 ; ******************************************************************************
 ; rot_int_1 - Rotina de atendimento da interrupção 1.
 ; ******************************************************************************
-rot_int_1:
+rot_int_bombas:
 	CALL assinala_int_bombas
     RFE
 
 ; ******************************************************************************
 ; rot_int_2 - Rotina de atendimento da interrupção 2,
 ; ******************************************************************************
-rot_int_2:
+rot_int_missil:
 	CALL assinala_int_missil
     RFE
     
 ; ******************************************************************************
 ; rot_int_3 - Rotina de atendimento da interrupção 3.
 ; ******************************************************************************
-rot_int_3:
+rot_int_energia:
 	CALL assinala_int_energia
     RFE
 
@@ -1550,7 +1550,7 @@ fim_reset_energia:
 reproduz_som:
     PUSH R0
     PUSH R1
-    MOV R1, REPRODUZ_SOM
+    MOV R1, REPRODUZ_SOM				; 
     MOV [R1], R0
     POP R1
     POP R0

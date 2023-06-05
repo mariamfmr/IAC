@@ -1276,9 +1276,12 @@ fim_limites_bomba:
 reset_bomba:
 	PUSH R3
 	PUSH R4
-	MOV R4, 2 						; número do valor aleatório que define 
+	PUSH R10
+	PUSH R11
+	CALL gerador_direcao			; gera um número aleatório em R11
+									; número do valor aleatório que define 
 									; a posição (0, 1 ou 2)
-	CMP R4, ESQUERDA				; ver se a posição aleatória é a esquerda
+	CMP R11, ESQUERDA				; ver se a posição aleatória é a esquerda
 	JNZ testa_meio					; se não for, vai testar o meio
 	MOV R1, LINHA_BOMBA_ESQ			; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_ESQ		; a inicial
@@ -1290,6 +1293,9 @@ testa_meio:
 	JNZ testa_direita				; se não for, resta a posição à direita
 	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
+	CALL gerador_direcao			; gera um número aleatório que define a 
+									; direção da bomba do meio
+	MOV R3, R11
 	JMP define_estado
 
 testa_direita:
@@ -1298,12 +1304,14 @@ testa_direita:
 	MOV R3, ESQUERDA
 
 define_estado:
-	MOV R4, 0
-	MOV R9, NAO_MINERAVEL
-	CMP R4, 0
+	CALL gerador_mineravel			; gera um número aleatório de 0-3 em R11	
+	MOV R9, NAO_MINERAVEL		
+	CMP R10, 0						; se o número for 0 é uma bomba mineravel
 	JNZ fim_reset_bomba
 	MOV R9, MINERAVEL
 fim_reset_bomba:
+	POP R11
+	POP R10
 	POP R4
 	POP R3
 	RET
@@ -1445,7 +1453,7 @@ reproduz_som:
 
 ; ******************************************************************************
 ; gerador_mineravel - gera valores pseudo-aleatórios para escolher se uma bomba
-;					  é minerável ou não. (0-2 - não minerável ; 3 - minerável)
+;					  é minerável ou não. (1-3 - não minerável ; 0 - minerável)
 ; Argumentos - R10 - Número pseudo-aleatório entre 0 e 3
 ; ******************************************************************************
 gerador_mineravel:
@@ -1470,13 +1478,13 @@ gerador_mineravel:
 
 ; ******************************************************************************
 ; gerador_direcao - gera valores pseudo-aleatórios para escolher a direção de uma
-;					bomba.
+;					bomba ou a sua posição.
 ;					(0- direita 1- esquerda 2- meio)
 ; Argumentos - R10 - Número pseudo-aleatório entre 0 e 2
 ; ******************************************************************************
 gerador_direcao:
 	PUSH R0 
-	PUSH R1
+	PUSH R6
 	MOV R0, PIN 							; carrega endereço do periférico PIN 						
 	MOV R11, [R0]							; lê valor do periférico e guarda
 
@@ -1485,12 +1493,12 @@ gerador_direcao:
 	AND R11, R0								; mantém apenas os bits de menor peso
 	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
 
-	MOV R1, 3								
-	DIV R11, R1 							; divide valor por 3
-	MOD R11, R1								; guarda resto da divisao
+	MOV R6, 3								
+	DIV R11, R6								; divide valor por 3
+	MOD R11, R6								; guarda resto da divisao
 	
 	fim_gerador_direcao:
-		POP R1 
+		POP R6 
 		POP R0
 		RET
 

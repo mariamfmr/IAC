@@ -440,6 +440,12 @@ testa_muda_personagem:
 	JMP muda_personagem
 
 comandos_jogo_pausado:
+	MOV R1, 15  
+	CMP R1, R0                          ; compara tecla primida com a tecla F
+	JNZ testa_recomeca_jogo 
+	JMP acaba_jogo    
+
+testa_recomeca_jogo:
 	MOV R1, 12				            ; compara tecla primida com a tecla C
 	CMP	R1, R0				            ; se forem iguais, recomeca_jogo
 	JNZ fim_chama_comando

@@ -452,14 +452,9 @@ comandos_decorrer_jogo:
 testa_missil_cima:
 	MOV R1, 5
 	CMP R1, R0							; compara a tecla com a tecla 0
-	JNZ testa_aumenta_energia
+	JNZ testa_acaba_jogo
 	JMP atira_missil_cima				; se forem iguais, atira um missil
 										; para cima
-testa_aumenta_energia:
-	MOV R1, 3
-	CMP R1, R0                          ; compara tecla primida com a tecla 3   
-	JNZ testa_acaba_jogo
-	JMP aumentar_energia                 ; se forem iguais, aumenta a energia
 
 testa_acaba_jogo:
 	MOV R1, 15  
@@ -635,7 +630,7 @@ aumentar_energia:
 sai_aumentar_energia:
     POP R1
     POP R0
-    JMP fim_chama_comando
+    RET
 
 ; ********************************************************************************
 ; diminuir_energia_missil - Diminui a energia do boneco com cada disparo de míssil
@@ -873,6 +868,7 @@ reset_1:						; repoe bomba e missil atingidos
 	MOV [POS_BOMBA_1], R1
 	MOV [POS_BOMBA_1+2], R2
 	MOV [POS_BOMBA_1+4], R3
+	MOV [POS_BOMBA_1+6], R9
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -914,6 +910,7 @@ reset_2:						; repoe bomba e missil atingidos
 	MOV [POS_BOMBA_2], R1
 	MOV [POS_BOMBA_2+2], R2
 	MOV [POS_BOMBA_2+4], R3
+	MOV [POS_BOMBA_2+6], R9
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -954,6 +951,7 @@ reset_3:						; repoe bomba e missil atingidos
 	MOV [POS_BOMBA_3], R1
 	MOV [POS_BOMBA_3+2], R2
 	MOV [POS_BOMBA_3+4], R3
+	MOV [POS_BOMBA_3+6], R9
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -994,6 +992,7 @@ reset_4:						; repoe bomba e missil atingidos
 	MOV [POS_BOMBA_4], R1
 	MOV [POS_BOMBA_4+2], R2
 	MOV [POS_BOMBA_4+4], R3
+	MOV [POS_BOMBA_4+6], R9
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -1140,7 +1139,7 @@ move_bombas:
 	MOV [POS_BOMBA_1], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_1+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_1+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_1+6], R5				; atualiza estado				
+	MOV [POS_BOMBA_1+6], R9			; atualiza estado				
 
 	CALL desenha_bomba_1                ; desenha bomba na nova posição
 
@@ -1162,7 +1161,7 @@ move_bomba_2:
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_2+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_2+6], R5				; atualiza estado					
+	MOV [POS_BOMBA_2+6], R9				; atualiza estado					
 
 	CALL desenha_bomba_2                ; desenha bomba na nova posição
 
@@ -1182,7 +1181,7 @@ move_bomba_3:
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_3+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_3+6], R5				; atualiza estado					
+	MOV [POS_BOMBA_3+6], R9				; atualiza estado					
 
 	CALL desenha_bomba_3                ; desenha bomba na nova posição
 move_bomba_4:
@@ -1202,7 +1201,7 @@ move_bomba_4:
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_4+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_4+6], R5				; atualiza estado		
+	MOV [POS_BOMBA_4+6], R9				; atualiza estado		
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
 
@@ -1270,6 +1269,8 @@ fim_limites_bomba:
 ;			  R3 - direção em que vai descer
 ; ******************************************************************************
 reset_bomba:
+	PUSH R3
+	PUSH R4
 	MOV R4, 2 						; número do valor aleatório que define 
 									; a posição (0, 1 ou 2)
 	CMP R4, ESQUERDA				; ver se a posição aleatória é a esquerda
@@ -1293,12 +1294,13 @@ testa_direita:
 
 define_estado:
 	MOV R4, 0
-	MOV R5, NAO_MINERAVEL
+	MOV R9, NAO_MINERAVEL
 	CMP R4, 0
 	JNZ fim_reset_bomba
-	MOV R5, MINERAVEL
-
+	MOV R9, MINERAVEL
 fim_reset_bomba:
+	POP R4
+	POP R3
 	RET
 
 ; ******************************************************************************

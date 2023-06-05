@@ -306,9 +306,9 @@ DEF_BOMBA:                              ; desenho da bomba 4x4
 DEF_BOMBA_EXPLODIDA:                              ; desenho da bomba 4x4
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
-	WORD		0, 0, 0, 0, 0, COR_VERMELHO, COR_VERMELHO, 
-				0, 0, COR_VERMELHO, COR_VERMELHO, 0, 0, 0, 
-				0, 0
+	WORD		0, COR_VERMELHO, COR_VERMELHO, 0, COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, 
+				COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, 0, COR_VERMELHO, 
+				COR_VERMELHO, 0
 
 DEF_BOMBA_MINERAVEL:
 	WORD 		LARGURA_BOMBA
@@ -320,9 +320,9 @@ DEF_BOMBA_MINERAVEL:
 DEF_BOMBA_MINERAVEL_EXP:                              ; desenho da bomba 4x4
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
-	WORD		0, 0, 0, 0, 0, COR_VERDE, COR_VERDE, 
-				0, 0, COR_VERDE, COR_VERDE, 0, 0, 0, 
-				0, 0
+	WORD		0, COR_VERDE, COR_VERDE, 0, COR_VERDE, COR_VERDE, COR_VERDE, 
+				COR_VERDE, COR_VERDE, COR_VERDE, COR_VERDE, COR_VERDE, 0, COR_VERDE, 
+				COR_VERDE, 0
 
 DEF_BOMBA_APAGADA:                      ; desenho da bomba apagada 4x4
 	WORD 		LARGURA_BOMBA
@@ -525,6 +525,7 @@ fim_chama_comando:
 ; ******************************************************************************
 rot_int_arma:
     CALL muda_cor_arma
+	CALL apaga_explosao					; apaga explosao anterior se existir
     RFE
     
 ; ******************************************************************************
@@ -623,7 +624,6 @@ reduzir_energia:
 	MOV R1, JOGO_EM_CURSO
 	CMP R0, R1							; verifica se jogo está em curso
 	JNZ sai_reduzir_energia				; se não, sai 
-
     MOV R0, INT_ENERGIA
 	MOV R0, [R0]
 	CMP R0, 0
@@ -1065,6 +1065,8 @@ testa_choque_4:					; testa choque com a bomba 4
 
 	CALL apaga_bomba_4
 
+	CALL apaga_explosao					; apaga explosao anterior se existir
+	
 	MOV R1, [POS_BOMBA_4]
 	MOV R2, [POS_BOMBA_4+2]
 	MOV [POS_CHOQUE], R1
@@ -1374,7 +1376,6 @@ move_bomba_4:
 	
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
-	CALL apaga_explosao					; apaga explosao anterior se existir
 
 sai_move_bombas:
 	POP R9

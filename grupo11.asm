@@ -1127,6 +1127,7 @@ move_bombas:
 	MOV R1, [POS_BOMBA_1]				; obtem linha atual
 	MOV R2, [POS_BOMBA_1+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_1+4]             ; obtem direção da bomba
+	MOV R4, [POS_BOMBA_1+6]             ; obtem direção da bomba
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1139,7 +1140,7 @@ move_bombas:
 	MOV [POS_BOMBA_1], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_1+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_1+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_1+6], R9			; atualiza estado				
+	MOV [POS_BOMBA_1+6], R9				; atualiza estado				
 
 	CALL desenha_bomba_1                ; desenha bomba na nova posição
 
@@ -1148,6 +1149,7 @@ move_bomba_2:
 	MOV R1, [POS_BOMBA_2]				; obtem linha atual
 	MOV R2, [POS_BOMBA_2+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_2+4]             ; obtem direção da bomba
+	MOV R4, [POS_BOMBA_2+6]             ; obtem direção da bomb
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1161,7 +1163,6 @@ move_bomba_2:
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_2+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_2+6], R9				; atualiza estado					
 
 	CALL desenha_bomba_2                ; desenha bomba na nova posição
 
@@ -1169,6 +1170,8 @@ move_bomba_3:
 	CALL apaga_bomba_3                  ; apaga a bomba na posição antiga
 	MOV R1, [POS_BOMBA_3]				; obtem linha atual
 	MOV R2, [POS_BOMBA_3+2]             ; obtem coluna atual
+	MOV R3, [POS_BOMBA_3+4]             ; obtem direção da bomba
+	MOV R4, [POS_BOMBA_3+6]             ; obtem direção da bomb
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1181,7 +1184,7 @@ move_bomba_3:
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_3+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_3+6], R9				; atualiza estado					
+				
 
 	CALL desenha_bomba_3                ; desenha bomba na nova posição
 move_bomba_4:
@@ -1189,6 +1192,7 @@ move_bomba_4:
 	MOV R1, [POS_BOMBA_4]				; obtem linha atual
 	MOV R2, [POS_BOMBA_4+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_4+4]             ; obtem direção da bomba
+	MOV R4, [POS_BOMBA_4+6]             ; obtem direção da bomb
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1201,7 +1205,7 @@ move_bomba_4:
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_4+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_4+6], R9				; atualiza estado		
+	
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
 

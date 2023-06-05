@@ -1340,7 +1340,8 @@ limites_direitos:						; limites de bombas que caminham
 limites_meio:							; limites de bombas que caminham para baixo
 	MOV R5, 18							; testar choque com personagem
 	CMP R5, R1
-	JZ reset_bomba
+	JNZ fim_limites_bomba
+	JMP perde_jogo
 
 fim_limites_bomba:
 	RET
@@ -1462,7 +1463,7 @@ testa_direita:
 	MOV R3, ESQUERDA
 
 define_estado:
-	CALL gerador_mineravel			; gera um número aleatório de 0-3 em R11	
+	CALL gerador_mineravel			; gera um número aleatório de 0-3 em R10	
 	MOV R9, NAO_MINERAVEL		
 	CMP R10, 0						; se o número for 0 é uma bomba mineravel
 	JNZ fim_reset_bomba

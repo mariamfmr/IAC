@@ -930,6 +930,8 @@ testa_choque_1:					; testa choque com a bomba 1
 	CALL apaga_bomba_1			; apaga a bomba que sofreu um choque
 								; apaga o missil que sofreu o choque
 
+	CALL apaga_explosao
+
 	MOV R1, [POS_BOMBA_1]
 	MOV R2, [POS_BOMBA_1+2]
 	MOV [POS_CHOQUE], R1
@@ -975,6 +977,8 @@ testa_choque_2:					; testa choque com a bomba 2
 
 	CALL apaga_bomba_2
 
+	CALL apaga_explosao
+
 	MOV R1, [POS_BOMBA_2]
 	MOV R2, [POS_BOMBA_2+2]
 	MOV [POS_CHOQUE], R1
@@ -1019,6 +1023,8 @@ testa_choque_3:					; testa choque com a bomba 3
 	JLT testa_choque_4			; se não estiver, testa-se o choque com a bomba 4
 
 	CALL apaga_bomba_3
+
+	CALL apaga_explosao
 
 	MOV R1, [POS_BOMBA_3]
 	MOV R2, [POS_BOMBA_3+2]
@@ -1653,11 +1659,11 @@ acaba_jogo:
 	PUSH R2
 	PUSH R3
 	PUSH R4
+	CALL apaga_explosao					; apaga explosao anterior se existir
 	MOV R4, JOGO_ACABADO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
 	CALL apaga_bombas			        ; apaga as bombas do ecrã
 	CALL apaga_misseis			        ; apaga o missil do ecrã
-	CALL apaga_explosao					; apaga explosao anterior se existir
 
 	MOV R2, LINHA_BOMBA_ESQ		
 	MOV [POS_BOMBA_1], R2				; repor linha bomba 1 à linha inicial
@@ -2354,10 +2360,10 @@ perde_jogo:
 	PUSH R3
 	PUSH R4
     MOV R4, JOGO_ACABADO
+	CALL apaga_explosao					; apaga explosao anterior se existir
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
 	CALL apaga_bombas			        ; apaga a bomba do ecrã
 	CALL apaga_misseis			        ; apaga o missil do ecrã
-	CALL apaga_explosao					; apaga explosao anterior se existir
 	MOV R1, 1
 
 	MOV R2, LINHA_BOMBA_ESQ		

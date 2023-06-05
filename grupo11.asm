@@ -1608,6 +1608,33 @@ gerador_direcao:
 		RET
 
 ; ******************************************************************************
+; gerador_posicao - gera valores pseudo-aleatórios para escolher a posicao de uma
+;					bomba.
+;					(0-  1-  2-	 3-  4-)
+; Argumentos - R10 - Número pseudo-aleatório entre 0 e 2
+; ******************************************************************************
+gerador_posicao:
+	PUSH R0 
+	PUSH R6
+	MOV R0, PIN 							; carrega endereço do periférico PIN 						
+	MOV R11, [R0]							; lê valor do periférico e guarda
+
+	MOV R0, 15								; define o valor 7 (0111 em binário) em R0
+	SHR R11, 4								; descarta os 4 bits de menor peso
+	AND R11, R0								; mantém apenas os bits de menor peso
+	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
+
+	MOV R6, 5								
+	DIV R11, R6								; divide valor por 3
+	MOD R11, R6								; guarda resto da divisao
+	
+	fim_gerador_direcao:
+		POP R6 
+		POP R0
+		RET
+
+
+; ******************************************************************************
 ; apaga_missil - Apaga o missil na sua posição atual.
 ; ******************************************************************************
 apaga_misseis:

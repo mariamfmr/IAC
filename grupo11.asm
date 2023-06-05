@@ -19,7 +19,8 @@ APAGA_AVISO     EQU COMANDOS + 40H		; endereço do comando para apagar o
 										; aviso de nenhum cenário selecionado
 APAGA_ECRA	 		EQU COMANDOS + 02H	; endereço para apagar todos os pixels
 SELECIONA_CENARIO	EQU COMANDOS + 42H	; endereço para selecionar fundo
-DISPLAYS   EQU 0A000H                   ; endereço dos displays 
+DISPLAYS   EQU 0A000H                   ; endereço dos displays
+PIN 	   EQU 0E002H
 TEC_LIN    EQU 0C000H                   ; endereço das linhas do teclado
 TEC_COL    EQU 0E000H                   ; endereço das colunas do teclado 
 LINHA_TEC  EQU 1                        ; 1ª linha a testar (0001b)
@@ -1441,6 +1442,57 @@ reproduz_som:
     POP R1
     POP R0
     RET
+
+; ******************************************************************************
+; gerador_mineravel - gera valores pseudo-aleatórios para escolher se uma bomba
+;					  é minerável ou não. (0-2 - não minerável ; 3 - minerável)
+; Argumentos - R10 - Número pseudo-aleatório entre 0 e 3
+; ******************************************************************************
+gerador_mineravel:
+	PUSH R0 
+	PUSH R1
+	MOV R0, PIN								; carrega endereço do periférico PIN 						
+	MOV R10, [R0]							; lê valor do periférico e guarda 
+
+	MOV R0, 15								; define o valor 15 (1111 em binário)
+	SHR R10, 4								; descarta os 4 bits de menor peso
+	AND R10, R0								; mantém apenas os bits de menor peso
+	ADD R10, 1								; adiciona 1 para garantir um valor entre 1 e 4
+
+	MOV R1, 4								
+	DIV R10, R1 							; divide valor por 4
+	MOD R10, R1								; guarda o resto da divisão (0 a 3)
+	
+	fim_gerador_mineravel:
+		POP R1 
+		POP R0
+		RET
+
+; ******************************************************************************
+; gerador_direcao - gera valores pseudo-aleatórios para escolher a direção de uma
+;					bomba.
+;					(0- direita 1- esquerda 2- meio)
+; Argumentos - R10 - Número pseudo-aleatório entre 0 e 2
+; ******************************************************************************
+gerador_direcao:
+	PUSH R0 
+	PUSH R1
+	MOV R0, PIN 							; carrega endereço do periférico PIN 						
+	MOV R11, [R0]							; lê valor do periférico e guarda
+
+	MOV R0, 7								; define o valor 7 (0111 em binário) em R0
+	SHR R11, 4								; descarta os 4 bits de menor peso
+	AND R11, R0								; mantém apenas os bits de menor peso
+	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
+
+	MOV R1, 3								
+	DIV R11, R1 							; divide valor por 3
+	MOD R11, R1								; guarda resto da divisao
+	
+	fim_gerador_direcao:
+		POP R1 
+		POP R0
+		RET
 
 ; ******************************************************************************
 ; apaga_missil - Apaga o missil na sua posição atual.

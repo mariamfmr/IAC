@@ -864,12 +864,7 @@ testa_choque_1:					; testa choque com a bomba 1
 	CALL aumentar_energia
 
 reset_1:						; repoe bomba e missil atingidos
-	CALL reset_bomba
-
-	MOV [POS_BOMBA_1], R1
-	MOV [POS_BOMBA_1+2], R2
-	MOV [POS_BOMBA_1+4], R3
-	MOV [POS_BOMBA_1+6], R9
+	CALL reset_bomba_1
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -906,12 +901,7 @@ reset_2:						; repoe bomba e missil atingidos
 	CALL apaga_bomba_2
 	CALL apaga_missil_1
 
-	CALL reset_bomba
-
-	MOV [POS_BOMBA_2], R1
-	MOV [POS_BOMBA_2+2], R2
-	MOV [POS_BOMBA_2+4], R3
-	MOV [POS_BOMBA_2+6], R9
+	CALL reset_bomba_2
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -947,12 +937,7 @@ testa_choque_3:					; testa choque com a bomba 3
 reset_3:						; repoe bomba e missil atingidos
 	CALL apaga_bomba_3
 
-	CALL reset_bomba
-
-	MOV [POS_BOMBA_3], R1
-	MOV [POS_BOMBA_3+2], R2
-	MOV [POS_BOMBA_3+4], R3
-	MOV [POS_BOMBA_3+6], R9
+	CALL reset_bomba_3
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -988,12 +973,7 @@ testa_choque_4:					; testa choque com a bomba 4
 reset_4:						; repoe bomba e missil atingidos
 	CALL apaga_bomba_4
 
-	CALL reset_bomba
-
-	MOV [POS_BOMBA_4], R1
-	MOV [POS_BOMBA_4+2], R2
-	MOV [POS_BOMBA_4+4], R3
-	MOV [POS_BOMBA_4+6], R9
+	CALL reset_bomba_4
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
@@ -1128,7 +1108,8 @@ move_bombas:
 	MOV R1, [POS_BOMBA_1]				; obtem linha atual
 	MOV R2, [POS_BOMBA_1+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_1+4]             ; obtem direção da bomba
-	MOV R4, [POS_BOMBA_1+6]             ; obtem direção da bomba
+	MOV R4, [POS_BOMBA_1+6]             ; obtem estado da bomba
+	MOV R9, R4
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1151,6 +1132,7 @@ move_bomba_2:
 	MOV R2, [POS_BOMBA_2+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_2+4]             ; obtem direção da bomba
 	MOV R4, [POS_BOMBA_2+6]             ; obtem direção da bomb
+	MOV R9, R4
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1164,6 +1146,7 @@ move_bomba_2:
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_2+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_1+6], R9				; atualiza estado		
 
 	CALL desenha_bomba_2                ; desenha bomba na nova posição
 
@@ -1173,6 +1156,7 @@ move_bomba_3:
 	MOV R2, [POS_BOMBA_3+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_3+4]             ; obtem direção da bomba
 	MOV R4, [POS_BOMBA_3+6]             ; obtem direção da bomb
+	MOV R9, R4
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1185,6 +1169,7 @@ move_bomba_3:
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_3+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_1+6], R9				; atualiza estado		
 				
 
 	CALL desenha_bomba_3                ; desenha bomba na nova posição
@@ -1194,6 +1179,7 @@ move_bomba_4:
 	MOV R2, [POS_BOMBA_4+2]             ; obtem coluna atual
 	MOV R3, [POS_BOMBA_4+4]             ; obtem direção da bomba
 	MOV R4, [POS_BOMBA_4+6]             ; obtem direção da bomb
+	MOV R9, R4
 
 	CALL atualiza_posicao				; obtem nova posição
 
@@ -1206,6 +1192,7 @@ move_bomba_4:
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_4+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_1+6], R9				; atualiza estado		
 	
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
@@ -1273,8 +1260,71 @@ fim_limites_bomba:
 ;			  R2 - valor da coluna atual
 ;			  R3 - direção em que vai descer
 ; ******************************************************************************
-reset_bomba:
+reset_bomba_1:
+	PUSH R1
+	PUSH R2
 	PUSH R3
+	PUSH R9
+	CALL reset_bomba
+	MOV [POS_BOMBA_1], R1
+	MOV [POS_BOMBA_1+2], R2
+	MOV [POS_BOMBA_1+4], R3
+	MOV [POS_BOMBA_1+6], R9
+	POP R9
+	POP R3
+	POP R2
+	POP R1
+	RET
+
+reset_bomba_2:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R9
+	CALL reset_bomba
+	MOV [POS_BOMBA_2], R1
+	MOV [POS_BOMBA_2+2], R2
+	MOV [POS_BOMBA_2+4], R3
+	MOV [POS_BOMBA_2+6], R9
+	POP R9
+	POP R3
+	POP R2
+	POP R1
+	RET
+
+reset_bomba_3:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R9
+	CALL reset_bomba
+	MOV [POS_BOMBA_3], R1
+	MOV [POS_BOMBA_3+2], R2
+	MOV [POS_BOMBA_3+4], R3
+	MOV [POS_BOMBA_3+6], R9
+	POP R9
+	POP R3
+	POP R2
+	POP R1
+	RET
+
+reset_bomba_4:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R9
+	CALL reset_bomba
+	MOV [POS_BOMBA_4], R1
+	MOV [POS_BOMBA_4+2], R2
+	MOV [POS_BOMBA_4+4], R3
+	MOV [POS_BOMBA_4+6], R9
+	POP R9
+	POP R3
+	POP R2
+	POP R1
+	RET
+
+reset_bomba:
 	PUSH R4
 	PUSH R10
 	PUSH R11
@@ -1289,7 +1339,7 @@ reset_bomba:
 	JMP	define_estado
 
 testa_meio:					
-	CMP R4, MEIO					; vê se a posição aleatória é a do meio
+	CMP R11, MEIO					; vê se a posição aleatória é a do meio
 	JNZ testa_direita				; se não for, resta a posição à direita
 	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
@@ -1313,7 +1363,6 @@ fim_reset_bomba:
 	POP R11
 	POP R10
 	POP R4
-	POP R3
 	RET
 
 ; ******************************************************************************

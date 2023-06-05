@@ -388,10 +388,10 @@ ciclo:
 ;                 sim, chama a rotina adequada.
 ;
 ; Comandos:
-; 0: descer bomba na sua diagonal direita
-; 4: subir missil na sua diagonal esquerda
-; 3: subir digito
-; 7: descer digito
+; 0: atirar missil para a esquerda
+; 2: atirar missil para a direita
+; 5: atirar missil para cima
+; D: pausar jogo
 ; C: começar jogo
 ; E: alterar personagem
 ; F: terminar jogo
@@ -406,6 +406,9 @@ chama_comando:
 	PUSH R6
 	PUSH R7
 	PUSH R8
+	PUSH R9
+	PUSH R10
+	PUSH R11
     MOV R0, [DEF_TECLA]                 ; obtem tecla carregada       
 	MOV R2, [DEF_TECLA+2] 	            ; obtem tecla anterior à carregada
 	CMP R2, R0 				            ; vê se é a mesma tecla
@@ -485,6 +488,9 @@ testa_acaba_jogo:
 	JMP acaba_jogo                      ; se forem iguais, acaba o jogo
 
 fim_chama_comando:
+	POP R11
+	POP R10
+	POP R9
 	POP R8
 	POP R7
 	POP R6
@@ -525,11 +531,10 @@ rot_int_energia:
     RFE
 
 ; ******************************************************************************
-; assinala_int_bombas - Assinala uma interrupção .
+; assinala_int_bombas - Assinala uma interrupção.
 ;
 ; Argumentos: R0 - Variável INT_BOMBAS que varia entre 0 e 1.
 ; ******************************************************************************
-
 assinala_int_bombas:
 	PUSH R0
     PUSH R1
@@ -542,11 +547,10 @@ assinala_int_bombas:
 
 
 ; ******************************************************************************
-; assinala_int_missil - Assinala uma interrupção .
+; assinala_int_missil - Assinala uma interrupção.
 ;
 ; Argumentos: R0 - Variável INT_MISSIL que varia entre 0 e 1.
 ; ******************************************************************************
-
 assinala_int_missil:
 	PUSH R0
     PUSH R1
@@ -558,11 +562,10 @@ assinala_int_missil:
 	RET
 
 ; ******************************************************************************
-; assinala_int_energia - Assinala uma interrupção .
+; assinala_int_energia - Assinala uma interrupção.
 ;
 ; Argumentos: R0 - Variável INT_ENERGIA que varia entre 0 e 1.
 ; ******************************************************************************
-
 assinala_int_energia:
 	PUSH R0
     PUSH R1
@@ -716,7 +719,10 @@ converte:                               ; converte o valor da energia
 ; ******************************************************************************
 ; muda_personagem - Altera a personagem de rapaz para rapariga e vice-versa.
 ; ******************************************************************************
-muda_personagem: 			
+muda_personagem: 
+	PUSH R0
+	PUSH R1		
+	PUSH R3
 	MOV R0, [ESTADO_PERSONAGEM]         ; obtem personagem atual
 	MOV R1, RAPAZ   
 	CMP R1, R0                          ; verifica se é o rapaz
@@ -724,11 +730,15 @@ muda_personagem:
 	MOV R3, SOM_PERSONAGEM		        ; obtem som de mudar personagem
 	CALL reproduz_som                   ; reproduz som de mudar personagem
 	
+	
 muda_rapariga:                          ; muda a rapariga para o rapaz
 	CALL apaga_personagem               ; apaga personagem atual         
 	CALL desenha_rapaz                  ; desenha nova personagem (rapaz)
 	MOV R2, RAPAZ                       
 	MOV [ESTADO_PERSONAGEM], R2         ; atualiza estado da personagem
+	POP R3
+	POP R1
+	POP R0
 	JMP fim_chama_comando
 
 muda_rapaz:
@@ -736,6 +746,9 @@ muda_rapaz:
 	CALL desenha_rapariga               ; desenha nova personagem (rapariga)
 	MOV R2, RAPARIGA
 	MOV [ESTADO_PERSONAGEM], R2         ; atualiza estado da personagem
+	POP R3
+	POP R1
+	POP R0
 	JMP fim_chama_comando
 
 ; ******************************************************************************
@@ -747,6 +760,7 @@ muda_rapaz:
 ;			  R3 - direção em que vai subir
 ; ******************************************************************************
 atualiza_posicao_missil:
+	PUSH R5
 	MOV R5, -1
 	CMP R5, R3
 	JZ fim_atualiza_posicao
@@ -764,36 +778,46 @@ atualiza_posicao_missil:
 move_esquerda_missil:
 	SUB R1, 1
 	SUB R2, 2
+	POP R5
 	RET
 
 move_meio_missil:
 	SUB R1, 1
+	POP R5
 	RET
 
 move_direita_missil:
 	SUB R1, 1
 	ADD R2, 2
+	POP R5
 	RET
 
 fim_atualiza_posicao:
+	POP R5
 	RET
 ; ******************************************************************************
 ; atira_missil - Ativa os misseis, passando-os de um estado parado (0) para 
 ;				 movimento, de acordo com a direção escolhida.
 ; ******************************************************************************
 atira_missil_esquerda:
+	PUSH R5
 	MOV R5, ESQUERDA			; valor a colocar caso haja algum missil parado
 	JMP procura_missil_parado
 
 atira_missil_cima:
+	PUSH R5
 	MOV R5, MEIO				; valor a colocar caso haja algum missil parado
 	JMP procura_missil_parado	
 	
 atira_missil_direita:
+	PUSH R5
 	MOV R5, DIREITA				; valor a colocar caso haja algum missil parado
 	JMP procura_missil_parado
 
 procura_missil_parado:
+	PUSH R1
+	PUSH R3
+	PUSH R3
 	MOV R1, -1					; estado parado a comparar
 	MOV R3, [POS_MISSIL_1+4]
 	CMP R1, R3					; compara estado atual do missil 1
@@ -812,22 +836,28 @@ procura_missil_parado:
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 
-	JMP fim_chama_comando		; se nenhum missil estiver ativo, vai para 
+	JMP fim_ativa_missil		; se nenhum missil estiver ativo, vai para 
 								; o fim do comando
 
 ativa_missil_1:
 	CALL diminuir_energia_missil
 	MOV [POS_MISSIL_1+4], R5	; atualiza direção com valor escolhido
-	JMP fim_chama_comando
+	JMP fim_ativa_missil
 
 ativa_missil_2:
 	CALL diminuir_energia_missil
 	MOV [POS_MISSIL_2+4], R5	; atualiza direção com valor escolhido
-	JMP fim_chama_comando
+	JMP fim_ativa_missil
 
 ativa_missil_3:
 	CALL diminuir_energia_missil
 	MOV [POS_MISSIL_3+4], R5	; atualiza direção com valor escolhido
+
+fim_ativa_missil:
+	POP R3
+	POP R2
+	POP R1
+	POP R5
 	JMP fim_chama_comando
 
 ; ******************************************************************************
@@ -839,6 +869,8 @@ ativa_missil_3:
 ;			  R3 - direção em que o missil vai subir
 ; ******************************************************************************
 testa_limites_missil:
+	PUSH R5
+	PUSH R6
 	MOV R6, -1					; valor do  limite esquerdo	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite	
 	JNZ	limite_direito
@@ -855,6 +887,7 @@ limite_superior:
 	CMP R6, R1					; ver se o missil ultrapassou esse limite	
 	JNZ testa_choque_1	
 	JMP reset_missil				; se sim, repõe-o
+
 	
 testa_choque_1:					; testa choque com a bomba 1
 	MOV R5, [POS_BOMBA_1]		; obtem linha bomba 1 (limite superior)
@@ -890,7 +923,8 @@ reset_1:						; repoe bomba e missil atingidos
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
-
+	POP R6
+	POP R5
 	RET
 
 testa_choque_2:					; testa choque com a bomba 2
@@ -927,7 +961,8 @@ reset_2:						; repoe bomba e missil atingidos
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
-
+	POP R6
+	POP R5
 	RET
 
 testa_choque_3:					; testa choque com a bomba 3
@@ -963,7 +998,8 @@ reset_3:						; repoe bomba e missil atingidos
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
-
+	POP R6
+	POP R5
 	RET
 
 testa_choque_4:					; testa choque com a bomba 4
@@ -999,16 +1035,21 @@ reset_4:						; repoe bomba e missil atingidos
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
-
+	POP R6
+	POP R5
 	RET
 
 fim_limites_missil:
+	POP R6
+	POP R5
 	RET
 
 reset_missil:
 	MOV R1, LINHA_MISSIL		; repor linha do missil 
 	MOV R2, COLUNA_MISSIL		; repor coluna do missil
 	MOV R3, -1					; repor estado do missil a parado (-1)
+	POP R6
+	POP R5
 	RET
 
 ; ******************************************************************************
@@ -1021,6 +1062,14 @@ reset_missil:
 move_misseis:
 	PUSH R0
 	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
+	PUSH R6
+	PUSH R7
+	PUSH R8
+	PUSH R9
 	MOV R0, [ESTADO_JOGO]				; obtem o estado do jogo
 	MOV R1, JOGO_EM_CURSO
 	CMP R0, R1 							;  se estiver em curso, continua
@@ -1098,6 +1147,14 @@ move_missel_3:
 	CALL desenha_missil_3               ; desenha missil na nova posição
 
 sai_move_misseis:
+	POP R9
+	POP R8
+	POP R7
+	POP R6
+	POP R5
+	POP R4
+	POP R3
+	POP R2
 	POP R1 
 	POP R0
 	RET
@@ -1112,6 +1169,14 @@ sai_move_misseis:
 move_bombas:
 	PUSH R0
     PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
+	PUSH R6
+	PUSH R7
+	PUSH R8
+	PUSH R9
 	MOV R0, [ESTADO_JOGO]				; obtem estado de jogo
 	MOV R1, JOGO_EM_CURSO
 	CMP R0, R1							; verifica se jogo está em curso
@@ -1219,6 +1284,14 @@ move_bomba_4:
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
 
 sai_move_bombas:
+	POP R9
+	POP R8
+	POP R7
+	POP R6
+	POP R5
+	POP R4
+	POP R3
+	POP R2
 	POP R1 
 	POP R0 
 	RET
@@ -1349,25 +1422,39 @@ reset_bomba:
 	PUSH R4
 	PUSH R10
 	PUSH R11
-	CALL gerador_direcao			; gera um número aleatório em R11
+	CALL gerador_posicao			; gera um número aleatório em R11
 									; número do valor aleatório que define 
 									; a posição (0, 1 ou 2)
-	CMP R11, ESQUERDA				; ver se a posição aleatória é a esquerda
-	JNZ testa_meio					; se não for, vai testar o meio
+	CMP R11, 0						; ver se a posição aleatória é a esquerda
+	JNZ testa_meio_esquerdo			; se não for, vai testar o meio
 	MOV R1, LINHA_BOMBA_ESQ			; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_ESQ		; a inicial
 	MOV R3, DIREITA
 	JMP	define_estado
 
-testa_meio:					
-	CMP R11, MEIO					; vê se a posição aleatória é a do meio
-	JNZ testa_direita				; se não for, resta a posição à direita
+testa_meio_esquerdo:					
+	CMP R11, 1						; vê se a posição aleatória é a do meio
+	JNZ testa_meio_baixo			; com direção para a esquerda
 	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
-	CALL gerador_direcao			; gera um número aleatório que define a 
-									; direção da bomba do meio
-	MOV R3, R11
-	JMP define_estado
+	MOV R3, ESQUERDA
+	JMP	define_estado
+
+testa_meio_baixo:				
+	CMP R11, 2						; vê se a posição aleatória é a do meio
+	JNZ testa_meio_direita			; com direção para a esquerda
+	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
+	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
+	MOV R3, MEIO
+	JMP	define_estado
+
+testa_meio_direita:
+	CMP R11, 3						; vê se a posição aleatória é a do meio
+	JNZ testa_direita				; com direção para a direita
+	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
+	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
+	MOV R3, ESQUERDA
+	JMP	define_estado
 
 testa_direita:
 	MOV R1, LINHA_BOMBA_DIR			; atualiza a linha e coluna da bomba para
@@ -1422,7 +1509,8 @@ move_direita:
 ;               associados ao decorrer do jogo.
 ; ******************************************************************************
 comeca_jogo:
-
+	PUSH R4
+	PUSH R1
 	MOV R4, JOGO_EM_CURSO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para em curso
 
@@ -1436,6 +1524,8 @@ comeca_jogo:
 	CALL desenha_bomba_4
 	MOV R1, 0
 	MOV  [SELECIONA_CENARIO], R1        ; altera para cenário do jogo
+	POP R1
+	POP R4
 
 	JMP fim_chama_comando
 
@@ -1443,16 +1533,20 @@ comeca_jogo:
 ; recomeca_jogo - Recomeça o jogo após pausado, mudando o estado de jogo.
 ; ******************************************************************************
 recomeca_jogo:
+	PUSH R4
 	MOV R4, JOGO_EM_CURSO
-	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
+	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
+	POP R4
 	JMP fim_chama_comando
 
 ; ******************************************************************************
 ; pausa_jogo - Pausa o jogo, mudando o estado de jogo.
 ; ******************************************************************************
 pausa_jogo:
+	PUSH R4
 	MOV R4, JOGO_PAUSADO
-	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
+	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
+	POP R4
 	JMP fim_chama_comando
 	
 ; ******************************************************************************
@@ -1460,6 +1554,10 @@ pausa_jogo:
 ;              do jogo e repondo-os na sua posição inicial.
 ; ******************************************************************************
 acaba_jogo:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
 	MOV R4, JOGO_ACABADO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
 	CALL apaga_bombas			        ; apaga as bombas do ecrã
@@ -1483,8 +1581,8 @@ acaba_jogo:
 	MOV R2, NAO_MINERAVEL
 	MOV [POS_BOMBA_2+6], R2
 
-	MOV R3, LINHA_BOMBA_MEIO			
-	MOV [POS_BOMBA_3], R3				; repor linha bomba 3 à linha inicial
+	MOV R2, LINHA_BOMBA_MEIO			
+	MOV [POS_BOMBA_3], R2				; repor linha bomba 3 à linha inicial
 	MOV R2, COLUNA_BOMBA_MEIO
 	MOV [POS_BOMBA_3+2], R2				; repor coluna bomba 4 à coluna inicial
 	MOV R2, DIREITA
@@ -1521,6 +1619,10 @@ acaba_jogo:
 
     MOV R1, 1
     MOV [SELECIONA_CENARIO], R1
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	JMP fim_chama_comando
 
 ; ******************************************************************************
@@ -1611,7 +1713,7 @@ gerador_direcao:
 ; gerador_posicao - gera valores pseudo-aleatórios para escolher a posicao de uma
 ;					bomba.
 ;					(0-  1-  2-	 3-  4-)
-; Argumentos - R10 - Número pseudo-aleatório entre 0 e 2
+; Argumentos - R11 - Número pseudo-aleatório entre 0 e 4
 ; ******************************************************************************
 gerador_posicao:
 	PUSH R0 
@@ -1628,10 +1730,10 @@ gerador_posicao:
 	DIV R11, R6								; divide valor por 3
 	MOD R11, R6								; guarda resto da divisao
 	
-	fim_gerador_direcao:
-		POP R6 
-		POP R0
-		RET
+fim_gerador_posicao:
+	POP R6 
+	POP R0
+	RET
 
 
 ; ******************************************************************************
@@ -1644,24 +1746,42 @@ apaga_misseis:
 	RET
 
 apaga_missil_1:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_MISSIL_1] 		        ; obtem linha atual do missil
 	MOV R2, [POS_MISSIL_1+2] 		    ; obtem coluna atual do missil
 	MOV R4, DEF_MISSIL_APAGADO	        ; definição do missil apagado (tudo a 0)
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 apaga_missil_2:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_MISSIL_2] 		        ; obtem linha atual do missil
 	MOV R2, [POS_MISSIL_2+2] 		    ; obtem coluna atual do missil
 	MOV R4, DEF_MISSIL_APAGADO	        ; definição do missil apagado (tudo a 0)
 	CALL desenha_boneco
+	POP R4
+	POP R2 
+	POP R1
 	RET
 
 apaga_missil_3:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_MISSIL_3] 		        ; obtem linha atual do missil
 	MOV R2, [POS_MISSIL_3+2] 		    ; obtem coluna atual do missil
 	MOV R4, DEF_MISSIL_APAGADO	        ; definição do missil apagado (tudo a 0)
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
@@ -1675,101 +1795,172 @@ apaga_bombas:
 	RET
 
 apaga_bomba_1:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_BOMBA_1] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_1+2] 		        ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA_APAGADA           ; definição da bomba apagada 
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 apaga_bomba_2:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_BOMBA_2] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_2+2] 		        ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA_APAGADA           ; definição da bomba apagada 
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 apaga_bomba_3:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_BOMBA_3] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_3+2] 		        ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA_APAGADA           ; definição da bomba apagada 
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 apaga_bomba_4:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_BOMBA_4] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_4+2] 		        ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA_APAGADA           ; definição da bomba apagada 
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
 ; apaga_personagem - Apaga a personagem na sua posição atual.
 ; ******************************************************************************
 apaga_personagem:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_PERSONAGEM] 		    ; obtem linha da personagem
 	MOV R2, [POS_PERSONAGEM+2] 		    ; obtem coluna da personagem
 	MOV R4, DEF_PERSONAGEM_APAGADA	    ; definição da personagem apagada 
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
 ; apaga_arma - Apaga a arma na sua posição atual.
 ; ******************************************************************************
 apaga_arma:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_ARMA] 		            ; obtem linha da arma
 	MOV R2, [POS_ARMA+2] 		        ; obtem coluna da arma
 	MOV R4, DEF_ARMA_APAGADA	        ; definição da arma apagada
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
 ; desenha_rapaz - Desenha o rapaz na sua posição definida.
 ; ******************************************************************************
 desenha_rapaz:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_PERSONAGEM] 		    ; obtem linha do rapaz
 	MOV R2, [POS_PERSONAGEM+2] 		    ; obtem coluna do rapaz
 	MOV R4, DEF_RAPAZ			        ; definição do rapaz
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
 ; desenha_rapariga - Desenha a rapariga na sua posição definida.
 ; ******************************************************************************
 desenha_rapariga:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_PERSONAGEM] 		    ; obtem linha da rapariga
 	MOV R2, [POS_PERSONAGEM+2] 		    ; obtem coluna da rapariga
 	MOV R4, DEF_RAPARIGA			    ; definição da rapariga
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
 ; desenha_missil - Desenha o missil na sua posição definida.
 ; ******************************************************************************
 desenha_missil_1:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_MISSIL_1] 		        ; obtem linha atual do missil
 	MOV R2, [POS_MISSIL_1+2] 		    ; obtem coluna atual do missil
 	MOV R4, DEF_MISSIL			        ; definição do missil
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 desenha_missil_2:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_MISSIL_2] 		        ; obtem linha atual do missil
 	MOV R2, [POS_MISSIL_2+2] 		    ; obtem coluna atual do missil
 	MOV R4, DEF_MISSIL			        ; definição do missil
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 desenha_missil_3:
+	PUSH R1
+	PUSH R2
+	PUSH R4
 	MOV R1, [POS_MISSIL_3] 		        ; obtem linha atual do missil
 	MOV R2, [POS_MISSIL_3+2] 		    ; obtem coluna atual do missil
 	MOV R4, DEF_MISSIL			        ; definição do missil
 	CALL desenha_boneco
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
 ; desenha_bomba - Desenha a bomba na sua posição definida.
 ; ******************************************************************************
 desenha_bomba_1:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
 	MOV R1, [POS_BOMBA_1] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_1+2] 		    ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA					; definição da bomba 
@@ -1781,9 +1972,19 @@ desenha_bomba_1:
 
 fim_bomba_1:
 	CALL desenha_boneco
+	POP R5
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	RET
 
 desenha_bomba_2:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
 	MOV R1, [POS_BOMBA_2] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_2+2] 		        ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA					; definição da bomba 
@@ -1795,8 +1996,18 @@ desenha_bomba_2:
 
 fim_bomba_2:
 	CALL desenha_boneco
+	POP R5
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	RET
 desenha_bomba_3:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
 	MOV R1, [POS_BOMBA_3] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_3+2] 		        ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA					; definição da bomba 
@@ -1808,9 +2019,19 @@ desenha_bomba_3:
 
 fim_bomba_3:
 	CALL desenha_boneco
+	POP R5
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	RET
 
 desenha_bomba_4:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
+	PUSH R5
 	MOV R1, [POS_BOMBA_4] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_4+2] 		    ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA					; definição da bomba 
@@ -1822,6 +2043,11 @@ desenha_bomba_4:
 
 fim_bomba_4:
 	CALL desenha_boneco
+	POP R5
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	RET
 
 ; ******************************************************************************
@@ -1829,6 +2055,9 @@ fim_bomba_4:
 ;                cinzenta, desenha-a a branco e vice-versa.
 ; ******************************************************************************
 desenha_arma:
+	PUSH R1
+	PUSH R2
+	PUSH R3
 	MOV R1, CINZENTO    
 	mov R2, [COR_ARMA]                  
 	CMP R2, R1                          ; ver se a cor atual da arma é cinzenta
@@ -1843,6 +2072,9 @@ desenha_arma:
     MOV [COR_ARMA], R1                  ; atualiza a cor da arma para cinzento
 
 fim_desenha_arma:
+	POP R4
+	POP R2
+	POP R1
 	RET
 
 muda_arma_branco:       
@@ -2021,6 +2253,10 @@ aumenta_linha_desenhada:
 ;              do jogo e repondo-os na sua posição inicial. Muda o cenário.
 ; *********************************************************************************
 perde_jogo:
+	PUSH R1
+	PUSH R2
+	PUSH R3
+	PUSH R4
     MOV R4, JOGO_ACABADO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
 	CALL apaga_bombas			        ; apaga a bomba do ecrã
@@ -2084,4 +2320,8 @@ perde_jogo:
     MOV R1, 2                           ; muda o cenário para final de jogo
                                         ; quando perdido
     MOV [SELECIONA_CENARIO], R1
+	POP R4
+	POP R3
+	POP R2
+	POP R1
 	JMP ciclo

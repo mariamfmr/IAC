@@ -66,6 +66,7 @@ ALTURA_MISSIL		 	EQU  1          ; altura do desenho do missil
 
 NAO_MINERAVEL			EQU  0			; valor associado às bombas não mineraveis
 MINERAVEL				EQU	 1			; valor associado às bombas mineraveis
+
 ; VALOREES ASSOCIADOS À DIREÇÃO DAS BOMBAS E MISSEIS
 DIREITA 				EQU 0			
 ESQUERDA				EQU 1
@@ -107,6 +108,8 @@ palete:                                 ; valores de cores para o desenho de
 	COR_AMARELO			EQU 0FFF0H
 	COR_VERMELHO_CLARO	EQU 0FE66H
 	COR_VERDE			EQU 0F0A0H
+
+; POSSIVEIS DESENHOS DAS BOMBAS
 
 ESTADO_JOGO:
 	WORD JOGO_ACABADO                   ; estado inicial do jogo (não começado)
@@ -820,16 +823,21 @@ ativa_missil_3:
 ; ******************************************************************************
 testa_limites_missil:
 	MOV R6, -1					; valor do  limite esquerdo	
-	CMP R6, R2					; ver se o missil ultrapassou esse limite		
-	JZ reset_missil				; se sim, repõe-o
+	CMP R6, R2					; ver se o missil ultrapassou esse limite	
+	JNZ	limite_direito
+	JMP reset_missil				; se sim, repõe-o
 
+limite_direito:
 	MOV R6, 64					; valor do limite direito	
-	CMP R6, R2					; ver se o missil ultrapassou esse limite		
-	JZ reset_missil				; se sim, repõe-o
+	CMP R6, R2					; ver se o missil ultrapassou esse limite	
+	JNZ limite_superior	
+	JMP reset_missil				; se sim, repõe-o
 
-	MOV R6, 0					; valor do limite superios
-	CMP R6, R1					; ver se o missil ultrapassou esse limite		
-	JZ reset_missil				; se sim, repõe-o
+limite_superior:
+	MOV R6, 0					; valor do limite superior
+	CMP R6, R1					; ver se o missil ultrapassou esse limite	
+	JNZ testa_choque_1	
+	JMP reset_missil				; se sim, repõe-o
 	
 testa_choque_1:					; testa choque com a bomba 1
 	MOV R5, [POS_BOMBA_1]		; obtem linha bomba 1 (limite superior)
@@ -854,14 +862,22 @@ testa_choque_1:					; testa choque com a bomba 1
 	CALL apaga_bomba_1			; apaga a bomba que sofreu um choque
 	CALL apaga_missil_1			; apaga o missil que sofreu o choque
 
-	MOV R4, LINHA_BOMBA_MEIO	; repoe linha da bomba
-	MOV R5, COLUNA_BOMBA_MEIO	; repoe coluna da bomba
-	MOV R1, LINHA_MISSIL		; repoe linha do missil
-	MOV R2, COLUNA_MISSIL		; repoe coluna do missil
+	MOV R4, [POS_BOMBA_1+6]
+	CMP R4, MINERAVEL
+	JNZ reset_1
+	CALL aumentar_energia
+
+reset_1:						; repoe bomba e missil atingidos
+	CALL reset_bomba
+
+	MOV [POS_BOMBA_1], R1
+	MOV [POS_BOMBA_1+2], R2
+	MOV [POS_BOMBA_1+4], R3
+
+	MOV R1, LINHA_MISSIL
+	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
 
-	MOV [POS_BOMBA_1], R4		; atualiza linha bomba
-	MOV [POS_BOMBA_1+2], R5		; atualiza coluna bomba
 	RET
 
 testa_choque_2:					; testa choque com a bomba 2
@@ -884,17 +900,25 @@ testa_choque_2:					; testa choque com a bomba 2
 	CMP R8, R2
 	JLT testa_choque_3			; se não estiver, testa-se o choque com a bomba 3
 
+	MOV R4, [POS_BOMBA_2+6]
+	CMP R4, MINERAVEL
+	JNZ reset_2
+	CALL aumentar_energia
+
+reset_2:						; repoe bomba e missil atingidos
 	CALL apaga_bomba_2
 	CALL apaga_missil_1
 
-	MOV R4, LINHA_BOMBA_MEIO
-	MOV R5, COLUNA_BOMBA_MEIO
+	CALL reset_bomba
+
+	MOV [POS_BOMBA_2], R1
+	MOV [POS_BOMBA_2+2], R2
+	MOV [POS_BOMBA_2+4], R3
+
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
 
-	MOV [POS_BOMBA_2], R4
-	MOV [POS_BOMBA_2+2], R5
 	RET
 
 testa_choque_3:					; testa choque com a bomba 3
@@ -917,16 +941,24 @@ testa_choque_3:					; testa choque com a bomba 3
 	CMP R8, R2
 	JLT testa_choque_4			; se não estiver, testa-se o choque com a bomba 4
 
+	MOV R4, [POS_BOMBA_3+6]
+	CMP R4, MINERAVEL
+	JNZ reset_3
+	CALL aumentar_energia
+
+reset_3:						; repoe bomba e missil atingidos
 	CALL apaga_bomba_3
 
-	MOV R4, LINHA_BOMBA_MEIO
-	MOV R5, COLUNA_BOMBA_MEIO
+	CALL reset_bomba
+
+	MOV [POS_BOMBA_3], R1
+	MOV [POS_BOMBA_3+2], R2
+	MOV [POS_BOMBA_3+4], R3
+
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
 
-	MOV [POS_BOMBA_3], R4
-	MOV [POS_BOMBA_3+2], R5
 	RET
 
 testa_choque_4:					; testa choque com a bomba 4
@@ -949,16 +981,24 @@ testa_choque_4:					; testa choque com a bomba 4
 	CMP R8, R2
 	JLT fim_limites_missil		; se não estiver, ja se testou todos os limites 
 
+	MOV R4, [POS_BOMBA_4+6]
+	CMP R4, MINERAVEL
+	JNZ reset_4
+	CALL aumentar_energia
+
+reset_4:						; repoe bomba e missil atingidos
 	CALL apaga_bomba_4
 
-	MOV R4, LINHA_BOMBA_MEIO
-	MOV R5, COLUNA_BOMBA_MEIO
+	CALL reset_bomba
+
+	MOV [POS_BOMBA_4], R1
+	MOV [POS_BOMBA_4+2], R2
+	MOV [POS_BOMBA_4+4], R3
+
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 	MOV R3, -1
 
-	MOV [POS_BOMBA_4], R4
-	MOV [POS_BOMBA_4+2], R5
 	RET
 
 fim_limites_missil:
@@ -1099,7 +1139,8 @@ move_bombas:
 	CALL testa_limites_bomba			; vê se a nova posição ultrapassa limites
 	MOV [POS_BOMBA_1], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_1+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_1+4], R3 			
+	MOV [POS_BOMBA_1+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_1+6], R5				; atualiza estado				
 
 	CALL desenha_bomba_1                ; desenha bomba na nova posição
 
@@ -1113,7 +1154,6 @@ move_bomba_2:
 
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_2+4], R3 
 
 	CALL reproduz_som	                ; reproduz som da bomba
 
@@ -1121,7 +1161,8 @@ move_bomba_2:
 	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_2+4], R3 			
+	MOV [POS_BOMBA_2+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_2+6], R5				; atualiza estado					
 
 	CALL desenha_bomba_2                ; desenha bomba na nova posição
 
@@ -1129,20 +1170,19 @@ move_bomba_3:
 	CALL apaga_bomba_3                  ; apaga a bomba na posição antiga
 	MOV R1, [POS_BOMBA_3]				; obtem linha atual
 	MOV R2, [POS_BOMBA_3+2]             ; obtem coluna atual
-	MOV R3, [POS_BOMBA_3+4]             ; obtem direção da bomba
 
 	CALL atualiza_posicao				; obtem nova posição
 
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_3+4], R3 
 
 	CALL reproduz_som	                ; reproduz som da bomba
 
 	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_3+4], R3 			
+	MOV [POS_BOMBA_3+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_3+6], R5				; atualiza estado					
 
 	CALL desenha_bomba_3                ; desenha bomba na nova posição
 move_bomba_4:
@@ -1155,14 +1195,14 @@ move_bomba_4:
 
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_4+4], R3 
 
 	CALL reproduz_som	                ; reproduz som da bomba
 
 	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
-	MOV [POS_BOMBA_4+4], R3 			
+	MOV [POS_BOMBA_4+4], R3 			; atualiza direção
+	MOV [POS_BOMBA_4+6], R5				; atualiza estado		
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição
 
@@ -1237,19 +1277,26 @@ reset_bomba:
 	MOV R1, LINHA_BOMBA_ESQ			; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_ESQ		; a inicial
 	MOV R3, DIREITA
-	JMP fim_reset_bomba
+	JMP	define_estado
 
 testa_meio:					
 	CMP R4, MEIO					; vê se a posição aleatória é a do meio
 	JNZ testa_direita				; se não for, resta a posição à direita
 	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
-	JMP fim_reset_bomba
+	JMP define_estado
 
 testa_direita:
 	MOV R1, LINHA_BOMBA_DIR			; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_DIR		; a inicial
 	MOV R3, ESQUERDA
+
+define_estado:
+	MOV R4, 0
+	MOV R5, NAO_MINERAVEL
+	CMP R4, 0
+	JNZ fim_reset_bomba
+	MOV R5, MINERAVEL
 
 fim_reset_bomba:
 	RET
@@ -1526,22 +1573,42 @@ desenha_missil_3:
 ; ******************************************************************************
 desenha_bomba_1:
 	MOV R1, [POS_BOMBA_1] 		        ; obtem linha atual da bomba
-	MOV R2, [POS_BOMBA_1+2] 		        ; obtem coluna atual da bomba
-	MOV R4, DEF_BOMBA			        ; definição da bomba 
+	MOV R2, [POS_BOMBA_1+2] 		    ; obtem coluna atual da bomba
+	MOV R4, DEF_BOMBA					; definição da bomba 
+	MOV R3, NAO_MINERAVEL				; ver se não é mineravel
+	MOV R5, [POS_BOMBA_1+6]
+	CMP R3, R5
+	JZ fim_bomba_1
+	MOV R4, DEF_BOMBA_MINERAVEL			; se for mineravel, muda a definição
+
+fim_bomba_1:
 	CALL desenha_boneco
 	RET
 
 desenha_bomba_2:
 	MOV R1, [POS_BOMBA_2] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_2+2] 		        ; obtem coluna atual da bomba
-	MOV R4, DEF_BOMBA			        ; definição da bomba 
+	MOV R4, DEF_BOMBA					; definição da bomba 
+	MOV R3, NAO_MINERAVEL				; ver se não é mineravel
+	MOV R5, [POS_BOMBA_2+6]
+	CMP R3, R5
+	JZ fim_bomba_2
+	MOV R4, DEF_BOMBA_MINERAVEL			; se for mineravel, muda a definição
+
+fim_bomba_2:
 	CALL desenha_boneco
 	RET
-
 desenha_bomba_3:
 	MOV R1, [POS_BOMBA_3] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_3+2] 		        ; obtem coluna atual da bomba
-	MOV R4, DEF_BOMBA_MINERAVEL			        ; definição da bomba 
+	MOV R4, DEF_BOMBA					; definição da bomba 
+	MOV R3, NAO_MINERAVEL				; ver se não é mineravel
+	MOV R5, [POS_BOMBA_3+6]
+	CMP R3, R5
+	JZ fim_bomba_3
+	MOV R4, DEF_BOMBA_MINERAVEL			; se for mineravel, muda a definição
+
+fim_bomba_3:
 	CALL desenha_boneco
 	RET
 
@@ -1549,6 +1616,13 @@ desenha_bomba_4:
 	MOV R1, [POS_BOMBA_4] 		        ; obtem linha atual da bomba
 	MOV R2, [POS_BOMBA_4+2] 		    ; obtem coluna atual da bomba
 	MOV R4, DEF_BOMBA					; definição da bomba 
+	MOV R3, NAO_MINERAVEL				; ver se não é mineravel
+	MOV R5, [POS_BOMBA_4+6]
+	CMP R3, R5
+	JZ fim_bomba_4
+	MOV R4, DEF_BOMBA_MINERAVEL			; se for mineravel, muda a definição
+
+fim_bomba_4:
 	CALL desenha_boneco
 	RET
 

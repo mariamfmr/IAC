@@ -1717,7 +1717,19 @@ acaba_jogo:
 	MOV [POS_MISSIL_3+2], R2			; repor coluna missil 1 à coluna inicial
 	MOV [POS_MISSIL_3+4], R4
 
-	CALL reset_energia
+	CALL reset_energia					; reset da energia
+	CALL apaga_ecra						; limpa o ecrã
+	MOV R0, [ESTADO_PERSONAGEM]         ; obtem personagem atual
+	MOV R2, RAPAZ   
+	CMP R2, R0                          ; verifica se é o rapaz
+	JNE testa_rapariga            		; se não, desenha rapariga 
+	CALL desenha_rapaz            		; se sim, desenha rapaz
+	JMP fim_acaba_jogo                      
+
+	testa_rapariga:
+	CALL desenha_rapariga        		 ; desenha rapariga
+
+	fim_acaba_jogo:
 
     MOV R1, 1
     MOV [SELECIONA_CENARIO], R1
@@ -2349,6 +2361,15 @@ aumenta_linha_desenhada:
 	MOV R2, R7								; repõe a coluna à coluna inicial
 	MOV R5, R8								; repõe o contador da largura do boneco
 	JMP desenha_pixel
+; *********************************************************************************
+; apaga_ecra - Apaga todos os pixeis do ecrã. 
+; *********************************************************************************
+apaga_ecra:
+	PUSH R0
+	MOV R0, APAGA_ECRA
+	MOV [R0], R0
+	POP R0
+	RET
 
 ; *********************************************************************************
 ; perde_jogo - Perde o jogo, mudando o estado de jogo, apagando os objetos do
@@ -2418,7 +2439,15 @@ perde_jogo:
 	MOV [POS_MISSIL_3+2], R2			; repor coluna missil 1 à coluna inicial
 	MOV [POS_MISSIL_3+4], R4			; repor estado do missil 
 
-	CALL reset_energia
+	CALL reset_energia					; reset da energia
+	CALL apaga_ecra						; limpa o ecrã
+	MOV R0, [ESTADO_PERSONAGEM]         ; obtem personagem atual
+	MOV R2, RAPAZ   
+	CMP R2, R0                          ; verifica se é o rapaz
+	JNZ testa_rapariga_2					
+	JMP desenha_rapaz                   ; se sim, desenha rapaz
+	testa_rapariga_2:
+	JMP desenha_rapariga				; se não, desenha rapariga
 
     MOV R1, 2                           ; muda o cenário para final de jogo
                                         ; quando perdido

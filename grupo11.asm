@@ -1448,8 +1448,9 @@ fim_limites_bomba:
 
 ; ******************************************************************************
 ; reset_bomba - Devolve a bomba ao topo do ecrã quando esta ultrapassa os
-; 				limites do ecrã. É colocada numa posição aleatória (canto
-;				esquerdo, meio ou direito).
+; 				limites do ecrã ou ocorre um choque. É colocada numa posição 
+;				aleatória (canto esquerdo, meio ou direito com uma direção 
+;				também aleatória).
 ;
 ; Argumentos: R1 - valor da linha atual 
 ;			  R2 - valor da coluna atual

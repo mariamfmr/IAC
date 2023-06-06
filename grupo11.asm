@@ -2441,13 +2441,17 @@ perde_jogo:
 
 	CALL reset_energia					; reset da energia
 	CALL apaga_ecra						; limpa o ecrã
-	MOV R0, [ESTADO_PERSONAGEM]         ; obtem personagem atual
+		MOV R0, [ESTADO_PERSONAGEM]         ; obtem personagem atual
 	MOV R2, RAPAZ   
 	CMP R2, R0                          ; verifica se é o rapaz
-	JNZ testa_rapariga_2					
-	JMP desenha_rapaz                   ; se sim, desenha rapaz
+	JNE testa_rapariga_2            		; se não, desenha rapariga 
+	CALL desenha_rapaz            		; se sim, desenha rapaz
+	JMP fim_perde_jogo                      
+
 	testa_rapariga_2:
-	JMP desenha_rapariga				; se não, desenha rapariga
+	CALL desenha_rapariga        		 ; desenha rapariga
+
+	fim_perde_jogo:
 
     MOV R1, 2                           ; muda o cenário para final de jogo
                                         ; quando perdido

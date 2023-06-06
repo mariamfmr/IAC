@@ -10,3 +10,5 @@ Este jogo permite através do teclado:
 - 5: lançar um míssil para cima
 - E: trocar de personagem
 - F: acabar o jogo
+
+

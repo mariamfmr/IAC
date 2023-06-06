@@ -1332,7 +1332,7 @@ move_bomba_2:
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_2+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_1+6], R9				; atualiza estado		
+	MOV [POS_BOMBA_2+6], R9				; atualiza estado		
 
 	CALL desenha_bomba_2                ; desenha bomba na nova posição
 
@@ -1355,7 +1355,7 @@ move_bomba_3:
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_3+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_1+6], R9				; atualiza estado		
+	MOV [POS_BOMBA_3+6], R9				; atualiza estado		
 				
 
 	CALL desenha_bomba_3                ; desenha bomba na nova posição
@@ -1378,7 +1378,7 @@ move_bomba_4:
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
 	MOV [POS_BOMBA_4+4], R3 			; atualiza direção
-	MOV [POS_BOMBA_1+6], R9				; atualiza estado		
+	MOV [POS_BOMBA_4+6], R9				; atualiza estado		
 	
 
 	CALL desenha_bomba_4                ; desenha bomba na nova posição

@@ -25,11 +25,17 @@ TEC_LIN    EQU 0C000H                   ; endereço das linhas do teclado
 TEC_COL    EQU 0E000H                   ; endereço das colunas do teclado 
 LINHA_TEC  EQU 1                        ; 1ª linha a testar (0001b)
 MASCARA    EQU 0FH                      ; para isolar os bits de menor peso
-DELAY      EQU 1000H                    ; valor associado às interrupções
 
 ; VALORES ASSOCIADOS AO TECLADO
-TECLA EQU -1                            ; valor inicial do valor da tecla
-ANTERIOR EQU -1                         ; valor inicial do valor da tecla anterior
+TECLA 		EQU -1                            ; valor inicial do valor da tecla
+TECLA_0 	EQU 0
+TECLA_5 	EQU 5
+TECLA_2 	EQU 2
+TECLA_C 	EQU 12
+TECLA_D 	EQU 13
+TECLA_E 	EQU 14
+TECLA_F 	EQU 15
+ANTERIOR 	EQU -1                         ; valor inicial do valor da tecla anterior
 
 ; VALORES ASSOCIADOS AOS OBJETOS DO JOGO
 RAPAZ 					EQU 0           ; 1ª opção de personagem
@@ -194,7 +200,7 @@ INT_BOMBAS:								; variável que indica se se tem de
                                         ; mover as bombas
 	WORD 0                              ; 1 - sim, 0 - não
 
-INT_MISSIL:							; variável que indica se se tem de
+INT_MISSIL:								; variável que indica se se tem de
                                         ; mover os misseis
 	WORD 0                              ; 1 - sim, 0 - não
 COR_ARMA:                               ; variavel que armazena qual a cor atual 
@@ -449,58 +455,58 @@ chama_comando:
                                         ; a esse estado
 
 comandos_jogo_acabado:
-	MOV R1, 12				            ; compara tecla primida com a tecla C
+	MOV R1, TECLA_C				            ; compara tecla primida com a tecla C
 	CMP R1, R0 
     JNZ testa_muda_personagem			       
 	JMP comeca_jogo                     ; se forem iguais, começa o jogo
 
 testa_muda_personagem:
-	MOV R1, 14				            ; compara tecla primida com a tecla E
+	MOV R1, TECLA_E				            ; compara tecla primida com a tecla E
 	CMP	R1, R0				            ; se forem iguais, muda a personagem
 	JNZ fim_chama_comando
 	JMP muda_personagem
 
 comandos_jogo_pausado:
-	MOV R1, 15  
+	MOV R1, TECLA_F  
 	CMP R1, R0                          ; compara tecla primida com a tecla F
 	JNZ testa_recomeca_jogo 
 	JMP acaba_jogo    
 
 testa_recomeca_jogo:
-	MOV R1, 12				            ; compara tecla primida com a tecla C
+	MOV R1, TECLA_C				            ; compara tecla primida com a tecla C
 	CMP	R1, R0				            ; se forem iguais, recomeca_jogo
 	JNZ fim_chama_comando
 	JMP recomeca_jogo
 
 comandos_decorrer_jogo:
-	MOV R1, 0
+	MOV R1, TECLA_0
 	CMP R1, R0							; compara a tecla com a tecla 0
 	JNZ testa_missil_direita
 	JMP atira_missil_esquerda			; se forem iguais, atira um missil
 										; para a esquerda	            
  
  testa_missil_direita:
-	MOV R1, 2
+	MOV R1, TECLA_2
 	CMP R1, R0							; compara a tecla com a tecla 0
 	JNZ testa_missil_cima
 	JMP atira_missil_direita			; se forem iguais, atira um missil
 										; para a direita
 
 testa_missil_cima:
-	MOV R1, 5
+	MOV R1, TECLA_5
 	CMP R1, R0							; compara a tecla com a tecla 0
 	JNZ testa_pausa_jogo
 	JMP atira_missil_cima				; se forem iguais, atira um missil
 										; para cima
 testa_pausa_jogo:
-	MOV R1, 13
+	MOV R1, TECLA_D
 	CMP R1, R0							; compara a tecla com a tecla 0
 	JNZ testa_acaba_jogo
 	JMP pausa_jogo						; se forem iguais, atira um missil
 										; para cima
 
 testa_acaba_jogo:
-	MOV R1, 15  
+	MOV R1, TECLA_F  
 	CMP R1, R0                          ; compara tecla primida com a tecla F
 	JNZ fim_chama_comando 
 	JMP acaba_jogo                      ; se forem iguais, acaba o jogo
@@ -898,7 +904,7 @@ limite_direito:
 	MOV R6, 64					; valor do limite direito	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite	
 	JNZ limite_superior	
-	JMP reset_missil				; se sim, repõe-o
+	JMP reset_missil			; se sim, repõe-o
 
 limite_superior:
 	MOV R6, 0					; valor do limite superior

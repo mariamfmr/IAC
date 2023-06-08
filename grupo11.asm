@@ -1553,9 +1553,9 @@ testa_meio_baixo:
 testa_meio_direita:
 	CMP R11, 3						; vê se a posição aleatória é a do meio
 	JNZ testa_direita				; com direção para a direita
-	MOV R1, LINHA_BOMBA_DIR			; atualiza a linha e coluna da bomba para
-	MOV R2, COLUNA_BOMBA_DIR		; a inicial
-	MOV R3, ESQUERDA
+	MOV R1, LINHA_BOMBA_MEIO		; atualiza a linha e coluna da bomba para
+	MOV R2, COLUNA_BOMBA_MEIO		; a inicial
+	MOV R3, DIREITA
 	JMP	define_estado
 
 testa_direita:

@@ -1635,20 +1635,28 @@ comeca_jogo:
 ; recomeca_jogo - Recomeça o jogo após pausado, mudando o estado de jogo.
 ; ******************************************************************************
 recomeca_jogo:
+	PUSH R1
 	PUSH R4
+	MOV	 R1, 0							; cenário de fundo número 0
+    MOV  [SELECIONA_CENARIO], R1		; seleciona o cenário de fundo de jogp
 	MOV R4, JOGO_EM_CURSO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
 	POP R4
+	POP R1
 	JMP fim_chama_comando
 
 ; ******************************************************************************
 ; pausa_jogo - Pausa o jogo, mudando o estado de jogo.
 ; ******************************************************************************
 pausa_jogo:
+	PUSH R1
 	PUSH R4
+	MOV	 R1, 3							; cenário de fundo número 0
+    MOV  [SELECIONA_CENARIO], R1		; seleciona o cenário de fundo inicial
 	MOV R4, JOGO_PAUSADO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
 	POP R4
+	POP R1
 	JMP fim_chama_comando
 	
 ; ******************************************************************************

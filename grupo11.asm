@@ -1830,7 +1830,6 @@ gerador_direcao:
 	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
 
 	MOV R6, 3								
-	DIV R11, R6								; divide valor por 3
 	MOD R11, R6								; guarda resto da divisao
 	
 	fim_gerador_direcao:
@@ -1856,7 +1855,6 @@ gerador_posicao:
 	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
 
 	MOV R6, 5								
-	DIV R11, R6								; divide valor por 3
 	MOD R11, R6								; guarda resto da divisao
 	
 fim_gerador_posicao:

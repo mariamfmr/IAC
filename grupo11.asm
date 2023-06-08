@@ -90,6 +90,12 @@ JOGO_ACABADO		EQU 0               ; estado de quando o jogo ainda não começou
 JOGO_EM_CURSO		EQU 1               ; estado enquanto o jogo está a decorrer
 JOGO_PAUSADO		EQU 2               ; estado de quando o jogo está pausado
 
+; VALORES ASSOCIADOS AOS LIMITES DO ECRÃ
+LIMITE_SUPERIOR		EQU 0
+LIMITE_INFERIOR		EQU 32
+LIMITE_DIREITO		EQU 64				
+LIMITE_ESQUERDO		EQU 0
+
 ; *********************************************************************************
 ; * Zona de Dados
 ; *********************************************************************************
@@ -901,13 +907,13 @@ testa_limites_missil:
 	JMP reset_missil				; se sim, repõe-o
 
 limite_direito:
-	MOV R6, 64					; valor do limite direito	
+	MOV R6, LIMITE_DIREITO		; valor do limite direito	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite	
 	JNZ limite_superior	
 	JMP reset_missil			; se sim, repõe-o
 
 limite_superior:
-	MOV R6, 0					; valor do limite superior
+	MOV R6, LIMITE_SUPERIOR		; valor do limite superior
 	CMP R6, R1					; ver se o missil ultrapassou esse limite	
 	JNZ testa_choque_1	
 	JMP reset_missil				; se sim, repõe-o
@@ -1420,7 +1426,7 @@ testa_limites_bomba:
 	CMP R5, R2
 	JZ reset_bomba						; caso tenha ultrapassado, 
 										; dá reset à posição da bomba
-	MOV R5, 34
+	MOV R5, 34							; coluna da bomba quando ocorre choque
 	CMP R5, R2							; testar choque com personagem 
 	JNZ fim_limites_bomba
 	JMP perde_jogo
@@ -1809,32 +1815,6 @@ gerador_mineravel:
 	
 	fim_gerador_mineravel:
 		POP R1 
-		POP R0
-		RET
-
-; ******************************************************************************
-; gerador_direcao - gera valores pseudo-aleatórios para escolher a direção de uma
-;					bomba ou a sua posição.
-;					(0- direita 1- esquerda 2- meio)
-; Argumentos - R10 - Número pseudo-aleatório entre 0 e 2
-; ******************************************************************************
-gerador_direcao:
-	PUSH R0 
-	PUSH R6
-	MOV R0, PIN 							; carrega endereço do periférico PIN 						
-	MOV R11, [R0]							; lê valor do periférico e guarda
-
-	MOV R0, 7								; define o valor 7 (0111 em binário) em R0
-	SHR R11, 4								; descarta os 4 bits de menor peso
-	AND R11, R0								; mantém apenas os bits de menor peso
-	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
-
-	MOV R6, 3								
-	DIV R11, R6								; divide valor por 3
-	MOD R11, R6								; guarda resto da divisao
-	
-	fim_gerador_direcao:
-		POP R6 
 		POP R0
 		RET
 

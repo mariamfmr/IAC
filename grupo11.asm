@@ -90,12 +90,6 @@ JOGO_ACABADO		EQU 0               ; estado de quando o jogo ainda não começou
 JOGO_EM_CURSO		EQU 1               ; estado enquanto o jogo está a decorrer
 JOGO_PAUSADO		EQU 2               ; estado de quando o jogo está pausado
 
-; VALORES ASSOCIADOS AOS LIMITES DO ECRÃ
-LIMITE_SUPERIOR		EQU 0
-LIMITE_INFERIOR		EQU 32
-LIMITE_DIREITO		EQU 64				
-LIMITE_ESQUERDO		EQU 0
-
 ; *********************************************************************************
 ; * Zona de Dados
 ; *********************************************************************************
@@ -907,13 +901,13 @@ testa_limites_missil:
 	JMP reset_missil				; se sim, repõe-o
 
 limite_direito:
-	MOV R6, LIMITE_DIREITO		; valor do limite direito	
+	MOV R6, 64					; valor do limite direito	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite	
 	JNZ limite_superior	
 	JMP reset_missil			; se sim, repõe-o
 
 limite_superior:
-	MOV R6, LIMITE_SUPERIOR		; valor do limite superior
+	MOV R6, 0					; valor do limite superior
 	CMP R6, R1					; ver se o missil ultrapassou esse limite	
 	JNZ testa_choque_1	
 	JMP reset_missil				; se sim, repõe-o
@@ -1426,7 +1420,7 @@ testa_limites_bomba:
 	CMP R5, R2
 	JZ reset_bomba						; caso tenha ultrapassado, 
 										; dá reset à posição da bomba
-	MOV R5, 34							; coluna da bomba quando ocorre choque
+	MOV R5, 34
 	CMP R5, R2							; testar choque com personagem 
 	JNZ fim_limites_bomba
 	JMP perde_jogo
@@ -1819,7 +1813,6 @@ gerador_mineravel:
 		RET
 
 ; ******************************************************************************
-<<<<<<< HEAD
 ; gerador_direcao - gera valores pseudo-aleatórios para escolher a direção de uma
 ;					bomba ou a sua posição.
 ;					(0- direita 1- esquerda 2- meio)
@@ -1845,8 +1838,6 @@ gerador_direcao:
 		RET
 
 ; ******************************************************************************
-=======
->>>>>>> 83d1a7c665b0bf60a6f405f43625b36cb8f7c6da
 ; gerador_posicao - gera valores pseudo-aleatórios para escolher a posicao de uma
 ;					bomba.
 ;					(0-  1-  2-	 3-  4-)

@@ -81,12 +81,12 @@ ESQUERDA				EQU 1
 MEIO					EQU 2
 
 ; VALORES ASSOCIADOS AOS SONS
-SOM_BOMBA			EQU 0               ; som quando a bomba é gerada
-SOM_PERSONAGEM		EQU 1               ; som quando muda personagem 
-SOM_MISSIL			EQU 2               ; som quando o missil se ativa
-SOM_EXPLOSAO 		EQU 3				; som quando se atinge uma bomba não minerável
-SOM_TECLADO 		EQU 4
-SOM_ENERGIA			EQU 5				; som quando se atinge bomba minerável
+SOM_PERSONAGEM		EQU 0               ; som quando muda personagem 
+SOM_MISSIL			EQU 1               ; som quando o missil se ativa
+SOM_EXPLOSAO 		EQU 2				; som quando se atinge uma bomba não minerável
+SOM_TECLADO 		EQU 3				; som quando se pressiona certas teclas
+SOM_ENERGIA			EQU 4				; som quando se atinge bomba minerável
+SOM_PERDER 			EQU 5               ; som quando se perde o jogo
 REPRODUZ_SOM		EQU COMANDOS + 5AH	; endereço do comando para tocar um som
 
 ;VALORES POSSIVEIS PARA A VARIAVEL ESTADO_JOGO
@@ -674,15 +674,18 @@ sai_reduzir_energia:
 aumentar_energia:
     PUSH R0
     PUSH R1 
+	PUSH R7
+	MOV R7, SOM_TECLADO
+	CALL reproduz_som
     MOV  R0, ENERGIA_PERSONAGEM         ; energia atual da personagem
     MOV  R0, [R0]              			; lê energia do da personagem
 	MOV  R1, 25
     ADD  R0, R1                         ; incrementa 25 na energia da nave
     CALL atualiza_energia               ; atualiza o valor na variável e nos 
                                         ; displays
-	MOV R0, SOM_ENERGIA
-	CALL reproduz_som
+
 sai_aumentar_energia:
+	POP R7
     POP R1
     POP R0
     RET
@@ -904,7 +907,7 @@ testa_limites_missil:
 	MOV R6, -1					; valor do  limite esquerdo	
 	CMP R6, R2					; ver se o missil ultrapassou esse limite	
 	JNZ	limite_direito
-	JMP reset_missil				; se sim, repõe-o
+	JMP reset_missil			; se sim, repõe-o
 
 limite_direito:
 	MOV R6, 64					; valor do limite direito	
@@ -1128,15 +1131,19 @@ desenha_explosao:
 	PUSH R3
 	PUSH R4
 	PUSH R5
+	PUSH R7
 	MOV R1, [POS_CHOQUE]
 	MOV R2, [POS_CHOQUE+2]
 	MOV R4, DEF_BOMBA_EXPLODIDA
 	MOV R3, MINERAVEL
 	CMP R5, R3
 	JNZ desenha_explosao_fim
-	MOV R4, DEF_BOMBA_MINERAVEL_EXP
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP	
 desenha_explosao_fim:
 	CALL desenha_boneco
+	MOV R7, SOM_EXPLOSAO
+	CALL reproduz_som
+	POP R7
 	POP R5
 	POP R4
 	POP R3
@@ -1474,6 +1481,7 @@ reset_bomba_2:
 	PUSH R1
 	PUSH R2
 	PUSH R3
+	PUSH R7
 	PUSH R9
 	CALL reset_bomba
 	MOV [POS_BOMBA_2], R1
@@ -1481,6 +1489,7 @@ reset_bomba_2:
 	MOV [POS_BOMBA_2+4], R3
 	MOV [POS_BOMBA_2+6], R9
 	POP R9
+	POP R7
 	POP R3
 	POP R2
 	POP R1
@@ -1520,7 +1529,6 @@ reset_bomba_4:
 
 reset_bomba:
 	PUSH R4
-	PUSH R7
 	PUSH R10
 	PUSH R11
 	CALL gerador_posicao			; gera um número aleatório em R11
@@ -1531,8 +1539,6 @@ reset_bomba:
 	MOV R1, LINHA_BOMBA_ESQ			; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_ESQ		; a inicial
 	MOV R3, DIREITA
-	MOV R7, SOM_BOMBA
-	CALL reproduz_som
 	JMP	define_estado
 
 testa_meio_esquerdo:					
@@ -1573,7 +1579,6 @@ define_estado:
 fim_reset_bomba:
 	POP R11
 	POP R10
-	POP R7
 	POP R4
 	RET
 
@@ -1797,40 +1802,13 @@ gerador_mineravel:
 	AND R10, R0								; mantém apenas os bits de menor peso
 	ADD R10, 1								; adiciona 1 para garantir um valor entre 1 e 4
 
-	MOV R1, 4								
-	DIV R10, R1 							; divide valor por 4
+	MOV R1, 4								; divide valor por 4
 	MOD R10, R1								; guarda o resto da divisão (0 a 3)
 	
 	fim_gerador_mineravel:
 		POP R1 
 		POP R0
 		RET
-
-; ******************************************************************************
-; gerador_direcao - gera valores pseudo-aleatórios para escolher a direção de uma
-;					bomba ou a sua posição.
-;					(0- direita 1- esquerda 2- meio)
-; Argumentos - R10 - Número pseudo-aleatório entre 0 e 2
-; ******************************************************************************
-gerador_direcao:
-	PUSH R0 
-	PUSH R6
-	MOV R0, PIN 							; carrega endereço do periférico PIN 						
-	MOV R11, [R0]							; lê valor do periférico e guarda
-
-	MOV R0, 7								; define o valor 7 (0111 em binário) em R0
-	SHR R11, 4								; descarta os 4 bits de menor peso
-	AND R11, R0								; mantém apenas os bits de menor peso
-	ADD R11, 1								; adiciona 1 para garantir valor entre 1 e 3
-
-	MOV R6, 3								
-	MOD R11, R6								; guarda resto da divisao
-	
-	fim_gerador_direcao:
-		POP R6 
-		POP R0
-		RET
-
 ; ******************************************************************************
 ; gerador_posicao - gera valores pseudo-aleatórios para escolher a posicao de uma
 ;					bomba.
@@ -2410,6 +2388,8 @@ perde_jogo:
 	PUSH R2
 	PUSH R3
 	PUSH R4
+	PUSH R7
+
     MOV R4, JOGO_ACABADO
 	CALL apaga_explosao					; apaga explosao anterior se existir
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabado
@@ -2486,6 +2466,11 @@ perde_jogo:
     MOV R1, 2                           ; muda o cenário para final de jogo
                                         ; quando perdido
     MOV [SELECIONA_CENARIO], R1
+
+	MOV R7, SOM_PERDER
+	CALL reproduz_som
+
+	POP R7
 	POP R4
 	POP R3
 	POP R2

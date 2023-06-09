@@ -193,6 +193,14 @@ ESTADO_PERSONAGEM:                      ; variavel que armazena qual das
 ENERGIA_BONECO:                         ; valor associado à energia (display)
 	WORD 0         	 	                ; valor atual da energia
 
+INT_ARMA:                           	; variável que indica se se tem de
+                                        ; mudar a cor da arma
+	WORD 0                              ; 1 - sim, 0 - não
+
+INT_EXPLOSAO:                           ; variável que indica se se tem de
+                                        ; mudar a cor da arma
+	WORD 0                              ; 1 - sim, 0 - não
+
 INT_ENERGIA:                            ; variável que indica se se tem de
                                         ; diminuir a energia da nave
 	WORD 0                              ; 1 - sim, 0 - não
@@ -429,6 +437,7 @@ ciclo:
 	CALL move_bombas
 	CALL move_misseis
 	CALL reduzir_energia
+	CALL muda_cor_arma
 	JMP ciclo
 
 ; *********************************************************************************
@@ -552,13 +561,21 @@ fim_chama_comando:
 
 ; ******************************************************************************
 ; rot_int_arma_explosao - Rotina da interrupção 0 (mudar cor da arma).
-;                		  Altera INT_ARMAS para 1 quando há interrupção.
+;                		  Altera INT_ARMA para 1 quando há interrupção.
 ; 				 		  Altera INT_EXPLOSAO para 1 quando há interrupção.
 ; ******************************************************************************
 rot_int_arma_explosao:
-    CALL muda_cor_arma
-	CALL apaga_explosao					; apaga explosao anterior se existir
+    PUSH R0
+    PUSH R1
+    MOV  R0, INT_ARMA
+    MOV  R1, 1                  	    ; assinala que houve uma interrupção
+    MOV  [R0], R1
+	MOV  R0, INT_EXPLOSAO 
+	MOV [R0], R1
+    POP  R1
+    POP  R0			
     RFE
+
     
 ; ******************************************************************************
 ; rot_int_bombas - Rotina de atendimento da interrupção 1. 
@@ -2239,8 +2256,17 @@ muda_cor_arma:
     PUSH R4
     MOV R1, JOGO_EM_CURSO
     MOV R2, [ESTADO_JOGO]
-    CMP R1, R2
+	CMP R1, R2
     JNZ fim_muda_cor_arma
+
+	MOV R0, INT_ARMA    				; verifica se houve interrupção para mudar cor da arma
+	MOV R0, [R0]
+	CMP R0, 0
+	JZ fim_muda_cor_arma				; se não, sai
+
+	MOV R0, INT_ARMA					; assinala a interrupção de volta a zero
+	MOV R1, 0
+	MOV [R0], R1
 	CALL desenha_arma
 fim_muda_cor_arma:
     POP R4

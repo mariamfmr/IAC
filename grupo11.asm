@@ -99,7 +99,7 @@ JOGO_PAUSADO		EQU 2               ; estado de quando o jogo está pausado
     topo_pilha:                         ; (200H bytes)
 
 tabela_interrupções:      
-    WORD rot_int_arma                   ; interrupção 0 - relógio muda cor da arma
+    WORD rot_int_arma_explosao          ; interrupção 0 - relógio muda cor da arma e anima explosão
     WORD rot_int_bombas                 ; interrupção 1 - relógio que move bombas
     WORD rot_int_missil                 ; interrupção 2 - relógio que move misséis 
     WORD rot_int_energia                ; interrupção 3	- relógio que decrementa energia
@@ -551,40 +551,20 @@ fim_chama_comando:
 	RET
 
 ; ******************************************************************************
-; rot_int_arma - Rotina da interrupção 0 (mudar cor da arma).
+; rot_int_arma_explosao - Rotina da interrupção 0 (mudar cor da arma).
+;                		  Altera INT_ARMAS para 1 quando há interrupção.
+; 				 		  Altera INT_EXPLOSAO para 1 quando há interrupção.
 ; ******************************************************************************
-rot_int_arma:
+rot_int_arma_explosao:
     CALL muda_cor_arma
 	CALL apaga_explosao					; apaga explosao anterior se existir
     RFE
     
 ; ******************************************************************************
-; rot_int_1 - Rotina de atendimento da interrupção 1.
+; rot_int_bombas - Rotina de atendimento da interrupção 1. 
+;			  	   Altera INT_BOMBAS para 1 quando há interrupção.
 ; ******************************************************************************
 rot_int_bombas:
-	CALL assinala_int_bombas
-    RFE
-
-; ******************************************************************************
-; rot_int_2 - Rotina de atendimento da interrupção 2,
-; ******************************************************************************
-rot_int_missil:
-	CALL assinala_int_missil
-    RFE
-    
-; ******************************************************************************
-; rot_int_3 - Rotina de atendimento da interrupção 3.
-; ******************************************************************************
-rot_int_energia:
-	CALL assinala_int_energia
-    RFE
-
-; ******************************************************************************
-; assinala_int_bombas - Assinala uma interrupção.
-;
-; Argumentos: R0 - Variável INT_BOMBAS que varia entre 0 e 1.
-; ******************************************************************************
-assinala_int_bombas:
 	PUSH R0
     PUSH R1
     MOV  R0, INT_BOMBAS
@@ -592,15 +572,13 @@ assinala_int_bombas:
     MOV  [R0], R1
     POP  R1
     POP  R0
-	RET
-
+    RFE
 
 ; ******************************************************************************
-; assinala_int_missil - Assinala uma interrupção.
-;
-; Argumentos: R0 - Variável INT_MISSIL que varia entre 0 e 1.
+; rot_int_missil - Rotina de atendimento da interrupção 2,
+;			       Altera INT_MISSIL para 1 quando há interrupção.
 ; ******************************************************************************
-assinala_int_missil:
+rot_int_missil:
 	PUSH R0
     PUSH R1
     MOV  R0, INT_MISSIL
@@ -608,14 +586,13 @@ assinala_int_missil:
     MOV  [R0], R1
     POP  R1
     POP  R0
-	RET
-
+    RFE
+    
 ; ******************************************************************************
-; assinala_int_energia - Assinala uma interrupção.
-;
-; Argumentos: R0 - Variável INT_ENERGIA que varia entre 0 e 1.
+; rot_int_energia - Rotina de atendimento da interrupção 3.
+;					Altera INT_ENERGIA para 1 quando há interrupção.
 ; ******************************************************************************
-assinala_int_energia:
+rot_int_energia:
 	PUSH R0
     PUSH R1
     MOV  R0, INT_ENERGIA
@@ -623,7 +600,8 @@ assinala_int_energia:
     MOV  [R0], R1
     POP  R1
     POP  R0
-	RET
+    RFE
+
 
 ; ******************************************************************************
 ; atualiza_energia_inicial - Muda a energia do boneco para 100

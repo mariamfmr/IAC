@@ -48,6 +48,7 @@ ALTURA_PERSONAGEM		EQU  11			; altura do desenho da personagem
 
 CINZENTO 		EQU 0                   ; 1ª cor possivel para a arma
 BRANCO 			EQU 1                   ; 2ª cor possivel para a arma
+VERMELHO		EQU 2					; 3ª cor possivel para a arma
 
 LINHA_ARMA		EQU	27                  ; linha inicial da arma
 COLUNA_ARMA		EQU	25                  ; coluna inicial da arma
@@ -375,6 +376,29 @@ DEF_ARMA_CINZENTA:                      ; desenho da arma cinzenta 5x9
                 COR_PRETO, COR_BEGE, COR_PRETO, COR_CINZENTO, COR_CINZENTO, COR_PRETO, 
                 COR_CINZENTO, COR_CINZENTO, COR_PRETO, COR_PRETO, COR_PRETO, 0, COR_PRETO, 
                 COR_PRETO, COR_CINZENTO, COR_CINZENTO, COR_PRETO, COR_BEGE, COR_BEGE, COR_PRETO, 
+                0, 0, 0
+
+
+DEF_ARMA_VERMELHA:                      ; desenho da arma cinzenta 5x9
+	WORD		LARGURA_ARMA
+	WORD   		ALTURA_ARMA
+	WORD		COR_PRETO, 0, 0, COR_PRETO, COR_VERMELHO, COR_PRETO, COR_PRETO, COR_PRETO, 0,
+				COR_PRETO, 0, COR_PRETO, COR_VERMELHO, COR_VERMELHO, COR_PRETO, COR_VERMELHO, 
+                COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_VERMELHO, COR_VERMELHO, 
+                COR_PRETO, COR_BEGE, COR_PRETO, COR_VERMELHO, COR_VERMELHO, COR_PRETO, 
+                COR_VERMELHO, COR_VERMELHO, COR_PRETO, COR_PRETO, COR_PRETO, 0, COR_PRETO, 
+                COR_PRETO, COR_VERMELHO, COR_VERMELHO, COR_PRETO, COR_BEGE, COR_BEGE, COR_PRETO, 
+                0, 0, 0
+
+DEF_ARMA_PRETA:                      ; desenho da arma cinzenta 5x9
+	WORD		LARGURA_ARMA
+	WORD   		ALTURA_ARMA
+	WORD		COR_PRETO, 0, 0, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, 0,
+				COR_PRETO, 0, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, 
+                COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, 
+                COR_PRETO, COR_BEGE, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, 
+                COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, 0, COR_PRETO, 
+                COR_PRETO, COR_PRETO, COR_PRETO, COR_PRETO, COR_BEGE, COR_BEGE, COR_PRETO, 
                 0, 0, 0
 
 ; *********************************************************************************
@@ -2187,9 +2211,13 @@ desenha_arma:
 	PUSH R3
 	MOV R1, CINZENTO    
 	mov R2, [COR_ARMA]                  
-	CMP R2, R1                          ; ver se a cor atual da arma é cinzenta
+	CMP R1, R2                          ; ver se a cor atual da arma é cinzenta
 	JZ muda_arma_branco                 ; se for, muda para branco
                                         ; se não, muda para cinzento
+	MOV R1, BRANCO
+	CMP R1, R2                          ; ver se a cor atual da arma é cinzenta
+	JZ muda_arma_vermelho
+
 	MOV R1, [POS_ARMA]                  ; obtem linha da arma
 	MOV R2, [POS_ARMA+2]                ; obtem coluna da arma
 	MOV R4, DEF_ARMA_CINZENTA           ; obtem definição da arma cinzenta
@@ -2210,6 +2238,15 @@ muda_arma_branco:
 	MOV R4, DEF_ARMA_BRANCA             ; obtem definição da arma branca
 	CALL desenha_boneco
     MOV R1, BRANCO                  
+    MOV [COR_ARMA], R1                  ; atualiza a cor da arma para branco
+	JMP fim_desenha_arma
+
+muda_arma_vermelho:       
+	MOV R1, [POS_ARMA]                  ; obtem linha da arma
+	MOV R2, [POS_ARMA+2]                ; obtem coluna da arma
+	MOV R4, DEF_ARMA_VERMELHA	            ; obtem definição da arma branca
+	CALL desenha_boneco
+    MOV R1, VERMELHO                  
     MOV [COR_ARMA], R1                  ; atualiza a cor da arma para branco
 	JMP fim_desenha_arma
 

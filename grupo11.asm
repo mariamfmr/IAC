@@ -67,11 +67,16 @@ COLUNA_BOMBA_MEIO		EQU	 30         ; coluna inicial da bomba no meio
 LARGURA_BOMBA		 	EQU	 4          ; largura do desenho da bomba
 ALTURA_BOMBA			EQU	 4          ; altura do desenho da bomba
 
+LIMITE_BOMBA 			EQU  3
+
 LINHA_MISSIL		  	EQU  21 	    ; linha inicial do missil
 COLUNA_MISSIL		 	EQU  33 	    ; coluna inicial do missil
 LARGURA_MISSIL		 	EQU  1          ; largura do desenho do missil
 ALTURA_MISSIL		 	EQU  1          ; altura do desenho do missil
+; VALOR ASSOCIADO AO ESTADO DO MISSIL
+DESATIVADO 				EQU -1
 
+; VALORES ASSOCIADOS AO ESTADO DAS BOMBAS
 NAO_MINERAVEL			EQU  0			; valor associado às bombas não mineraveis
 MINERAVEL				EQU	 1			; valor associado às bombas mineraveis
 
@@ -79,6 +84,11 @@ MINERAVEL				EQU	 1			; valor associado às bombas mineraveis
 DIREITA 				EQU 0			
 ESQUERDA				EQU 1
 MEIO					EQU 2
+; VALORES ASSOCIADOS AOS LIMITES DO ECRÃ
+
+LIMITE_DIREITO 			EQU 64
+LIMITE_ESQUERDO 		EQU 0
+LIMITE_SUPERIOR			EQU -1
 
 ; VALORES ASSOCIADOS AOS SONS
 SOM_PERSONAGEM		EQU 0               ; som quando muda personagem 
@@ -167,19 +177,19 @@ POS_MISSIL_1:                           ; variável que armazena a posição atu
                                         ; do missil
 	WORD LINHA_MISSIL  		            ; valor da linha atual do missil
 	WORD COLUNA_MISSIL	                ; valor da coluna atual do missil
-	WORD -1								; valor associado à direção do missil
+	WORD DESATIVADO								; valor associado à direção do missil
 
 POS_MISSIL_2:                           ; variável que armazena a posição atual
                                         ; do missil 2
 	WORD LINHA_MISSIL	                ; valor da linha atual do missil
 	WORD COLUNA_MISSIL	                ; valor da coluna atual do missil
-	WORD -1								; valor associado à direção do missil
+	WORD DESATIVADO								; valor associado à direção do missil
 
 POS_MISSIL_3:                           ; variável que armazena a posição atual
                                         ; do missil 3
 	WORD LINHA_MISSIL	                ; valor da linha atual do missil
 	WORD COLUNA_MISSIL	                ; valor da coluna atual do missil
-	WORD -1								; valor associado à direção do missil
+	WORD DESATIVADO						; valor associado à direção do missil
 
 POS_ARMA:								; variável que armazena posição da arma
 	WORD LINHA_ARMA
@@ -791,9 +801,9 @@ muda_rapaz:
 ; ******************************************************************************
 atualiza_posicao_missil:
 	PUSH R5
-	MOV R5, -1								; verifica se missil está ativo
+	MOV R5, -1								; verifica se missil está desativado
 	CMP R5, R3								
-	JZ fim_atualiza_posicao					; se não, sai	
+	JZ fim_atualiza_posicao					; se sim, sai	
 
 	MOV R5, ESQUERDA						; verifica se o missíl se move para a esquerda
 	CMP R5, R3
@@ -809,8 +819,8 @@ atualiza_posicao_missil:
 	RET
 
 move_esquerda_missil:
-	SUB R1, 1
-	SUB R2, 2
+	SUB R1, 1								; decrementa 1 na linha atual
+	SUB R2, 2								; decrementa 2 na coluna atual
 	POP R5
 	RET
 
@@ -819,9 +829,9 @@ move_meio_missil:
 	POP R5
 	RET
 
-move_direita_missil:
-	SUB R1, 1
-	ADD R2, 2
+move_direita_missil:						
+	SUB R1, 1								; decrementa 1 na linha atual
+	ADD R2, 2								; incrementa 2 na coluna atual
 	POP R5
 	RET
 
@@ -829,62 +839,62 @@ fim_atualiza_posicao:
 	POP R5
 	RET
 ; ******************************************************************************
-; atira_missil - Ativa os mísseis, passando-os de um estado parado (0) para 
+; atira_missil - Ativa os mísseis, passando-os de um estado parado (-1) para 
 ;				 movimento, de acordo com a direção escolhida.
 ; ******************************************************************************
 atira_missil_esquerda:
 	PUSH R5
-	MOV R5, ESQUERDA			; valor a colocar caso haja algum missil parado
+	MOV R5, ESQUERDA						; valor a colocar caso haja algum missil parado
 	JMP procura_missil_parado
 
 atira_missil_cima:
 	PUSH R5
-	MOV R5, MEIO				; valor a colocar caso haja algum missil parado
+	MOV R5, MEIO							; valor a colocar caso haja algum missil parado
 	JMP procura_missil_parado	
 	
 atira_missil_direita:
 	PUSH R5
-	MOV R5, DIREITA				; valor a colocar caso haja algum missil parado
+	MOV R5, DIREITA							; valor a colocar caso haja algum missil parado
 	JMP procura_missil_parado
 
 procura_missil_parado:
 	PUSH R1
 	PUSH R3
 	PUSH R3
-	MOV R1, -1					; estado parado a comparar
+	MOV R1, -1								; estado parado a comparar
 	MOV R3, [POS_MISSIL_1+4]
-	CMP R1, R3					; compara estado atual do missil 1
-	JZ ativa_missil_1			; caso esteja parado (0), ativa-o
+	CMP R1, R3								; compara estado atual do missil 1
+	JZ ativa_missil_1						; caso esteja parado, ativa-o
 
 	MOV R1, -1
 	MOV R3, [POS_MISSIL_2+4]
-	CMP R1, R3					; compara estado atual do missil 2
-	JZ ativa_missil_2			; caso esteja parado, ativa-o
+	CMP R1, R3								; compara estado atual do missil 2
+	JZ ativa_missil_2						; caso esteja parado, ativa-o
 
 	MOV R1, -1
 	MOV R3, [POS_MISSIL_3+4]
-	CMP R1, R3					; compara estado atual do missil 3
-	JZ ativa_missil_3			; caso esteja parado, ativa-o
+	CMP R1, R3								; compara estado atual do missil 3
+	JZ ativa_missil_3						; caso esteja parado, ativa-o
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 
-	JMP fim_ativa_missil		; se nenhum missil estiver ativo, vai para 
-								; o fim do comando
+	JMP fim_ativa_missil					; se nenhum missil estiver ativo, vai para 
+											; o fim do comando
 
 ativa_missil_1:
-	CALL diminuir_energia_missil
-	MOV [POS_MISSIL_1+4], R5	; atualiza direção com valor escolhido
+	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 1
+	MOV [POS_MISSIL_1+4], R5				; atualiza direção com valor escolhido
 	JMP fim_ativa_missil
 
 ativa_missil_2:
-	CALL diminuir_energia_missil
-	MOV [POS_MISSIL_2+4], R5	; atualiza direção com valor escolhido
+	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 2
+	MOV [POS_MISSIL_2+4], R5				; atualiza direção com valor escolhido
 	JMP fim_ativa_missil
 
 ativa_missil_3:
-	CALL diminuir_energia_missil
-	MOV [POS_MISSIL_3+4], R5	; atualiza direção com valor escolhido
+	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 3
+	MOV [POS_MISSIL_3+4], R5				; atualiza direção com valor escolhido
 
 fim_ativa_missil:
 	POP R3
@@ -904,127 +914,124 @@ fim_ativa_missil:
 testa_limites_missil:
 	PUSH R5
 	PUSH R6
-	MOV R6, -1					; valor do  limite esquerdo	
-	CMP R6, R2					; ver se o missil ultrapassou esse limite	
+	MOV R6, LIMITE_ESQUERDO					; valor do  limite esquerdo	(-1)
+	CMP R6, R2								; ver se o missil ultrapassou esse limite	
 	JNZ	limite_direito
-	JMP reset_missil			; se sim, repõe-o
+	JMP reset_missil						; se sim, repõe-o
 
 limite_direito:
-	MOV R6, 64					; valor do limite direito	
-	CMP R6, R2					; ver se o missil ultrapassou esse limite	
+	MOV R6, LIMITE_DIREITO					; valor do limite direito (64)
+	CMP R6, R2								; ver se o missil ultrapassou esse limite	
 	JNZ limite_superior	
-	JMP reset_missil			; se sim, repõe-o
+	JMP reset_missil						; se sim, repõe-o
 
 limite_superior:
-	MOV R6, 0					; valor do limite superior
-	CMP R6, R1					; ver se o missil ultrapassou esse limite	
-	JNZ testa_choque_1	
-	JMP reset_missil				; se sim, repõe-o
+	MOV R6, LIMITE_SUPERIOR					; valor do limite superior (-1)
+	CMP R6, R1								; ver se o missil ultrapassou esse limite	
+	JNZ testa_choque_1						; se não, verifica se houve choque
+	JMP reset_missil						; se sim, repõe-o
 
 	
-testa_choque_1:					; testa choque com a bomba 1
-	MOV R5, [POS_BOMBA_1]		; linha bomba 1 (limite superior)
+testa_choque_1:								; testa choque com a bomba 1
+	MOV R5, [POS_BOMBA_1]					; obtém linha bomba 1 (limite superior)
 	MOV R6, R5
-	ADD R6, 3					; limite inferior da bomba 1
-	MOV R7, [POS_BOMBA_1+2]		; coluna bomba 1 (limite esquerdo)
+	ADD R6, LIMITE_BOMBA					; determina limite inferior da bomba 1
+	MOV R7, [POS_BOMBA_1+2]					; obtém coluna bomba 1 (limite esquerdo)
 	MOV R8, R7					
-	ADD R8, 3					; limite direito da bomba 1
+	ADD R8, LIMITE_BOMBA					; determmina limite direito da bomba 1
 
-	; ver se o missil está dentro dos limites da linha da bomba
+	; ver se o missil está dentro dos limites da linha da bomba 1
 	CMP R5, R1					
 	JGT testa_choque_2
 	CMP R6, R1
 	JLT testa_choque_2
 
-	; ver se o missil esta dentro dos limites da coluna da bomba
+	; ver se o missil esta dentro dos limites da coluna da bomba 1
 	CMP R7, R2
 	JGT testa_choque_2
 	CMP R8, R2
-	JLT testa_choque_2			; se não estiver, testa-se o choque com a bomba 2
+	JLT testa_choque_2						; se não estiver, testa-se o choque com a bomba 2
 
-	CALL apaga_bomba_1			; apaga a bomba que sofreu um choque
-								; apaga o missil que sofreu o choque
-
-	CALL apaga_explosao
+	CALL apaga_bomba_1						; apaga a bomba que sofreu um choque
+	CALL apaga_explosao						; apaga explosao anterior se existir
 
 
 	MOV R1, [POS_BOMBA_1]
 	MOV R2, [POS_BOMBA_1+2]
-	MOV [POS_CHOQUE], R1
-	MOV [POS_CHOQUE+2], R2
+	MOV [POS_CHOQUE], R1					; armazena linha do choque
+	MOV [POS_CHOQUE+2], R2					; armazena coluna do choque
 
-	MOV R5, [POS_BOMBA_1+6]
-	CALL desenha_explosao
+	MOV R5, [POS_BOMBA_1+6]					; obtém estado da bomba
+	CALL desenha_explosao     				; desenha explosão de acordo com estado
 
-	CMP R5, MINERAVEL
+	CMP R5, MINERAVEL						; verifica se a bomba atingida é minerável
 	JNZ reset_1
-	MOV R4, DEF_BOMBA_MINERAVEL_EXP
-	CALL aumentar_energia
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
+	CALL aumentar_energia					; incrementa na energia 
 
-reset_1:						; repoe bomba e missil atingidos
+reset_1:									; repõe bomba e míssil atingidos
 	CALL reset_bomba_1
 
-	MOV R1, LINHA_MISSIL
-	MOV R2, COLUNA_MISSIL
-	MOV R3, -1
+	MOV R1, LINHA_MISSIL					; repõe linha do míssil 
+	MOV R2, COLUNA_MISSIL					; repõe coluna do míssil
+	MOV R3, DESATIVADO						; repõe estado do míssil para desativado
 	POP R6
 	POP R5
 	RET
 
-testa_choque_2:					; testa choque com a bomba 2
-	MOV R5, [POS_BOMBA_2]		; linha bomba 2
+testa_choque_2:								; testa choque com a bomba 2
+	MOV R5, [POS_BOMBA_2]					; obtém linha bomba 2
 	MOV R6, R5
-	ADD R6, 3					; limite inferior da bomba 2
-	MOV R7, [POS_BOMBA_2+2]		; coluna bomba 2
+	ADD R6, LIMITE_BOMBA					; determina limite inferior da bomba 2
+	MOV R7, [POS_BOMBA_2+2]					; obtém coluna bomba 2
 	MOV R8, R7
-	ADD R8, 3					; limite direito da bomba 2
+	ADD R8, LIMITE_BOMBA					; determina limite direito da bomba 2
 
-	; ver se o missil está dentro dos limites da linha da bomba
+	; ver se o missil está dentro dos limites da linha da bomba 2
 	CMP R5, R1
 	JGT testa_choque_3
 	CMP R6, R1
 	JLT testa_choque_3
 
-	; ver se o missil esta dentro dos limites da coluna da bomba
+	; ver se o missil esta dentro dos limites da coluna da bomba 2
 	CMP R7, R2
 	JGT testa_choque_3
 	CMP R8, R2
-	JLT testa_choque_3			; se não estiver, testa-se o choque com a bomba 3
+	JLT testa_choque_3						; se não estiver, testa-se o choque com a bomba 3
 
-	CALL apaga_bomba_2
-
-	CALL apaga_explosao
+	CALL apaga_bomba_2						; apaga a bomba que sofreu um choque
+	CALL apaga_explosao						; apaga explosao anterior se existir
 
 	MOV R1, [POS_BOMBA_2]
 	MOV R2, [POS_BOMBA_2+2]
-	MOV [POS_CHOQUE], R1
-	MOV [POS_CHOQUE+2], R2
+	MOV [POS_CHOQUE], R1					; armazena linha do choque
+	MOV [POS_CHOQUE+2], R2					; armazena coluna do choque
 
-	MOV R5, [POS_BOMBA_2+6]
-	CALL desenha_explosao
+	MOV R5, [POS_BOMBA_2+6]					; obtém estado da bomba
+	CALL desenha_explosao     				; desenha explosão de acordo com estado
 
-	CMP R5, MINERAVEL
-	JNZ reset_2
-	MOV R4, DEF_BOMBA_MINERAVEL_EXP
-	CALL aumentar_energia
+	CMP R5, MINERAVEL						; verifica se a bomba é minerável
+	JNZ reset_2								; se sim, incrementa energia
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
+	CALL aumentar_energia					
 
-reset_2:						; repoe bomba e missil atingidos
+reset_2:									; repoe bomba e missil atingidos
 	CALL reset_bomba_2
 
-	MOV R1, LINHA_MISSIL
-	MOV R2, COLUNA_MISSIL
-	MOV R3, -1
+	MOV R1, LINHA_MISSIL					; repõe linha do míssil 
+	MOV R2, COLUNA_MISSIL					; repõe coluna do míssil
+	MOV R3, DESATIVADO						; repõe estado do míssil para desativado
 	POP R6
 	POP R5
 	RET
 
-testa_choque_3:					; testa choque com a bomba 3
-	MOV R5, [POS_BOMBA_3]		; linha bomba 3
+testa_choque_3:								; testa choque com a bomba 3
+	MOV R5, [POS_BOMBA_3]					; obtém linha bomba 3
 	MOV R6, R5
-	ADD R6, 3					; limite inferior da bomba 3
-	MOV R7, [POS_BOMBA_3+2]		; coluna bomba 3
+	ADD R6, LIMITE_BOMBA					; determina limite inferior da bomba 3
+	MOV R7, [POS_BOMBA_3+2]					; obtém coluna bomba 3
 	MOV R8, R7
-	ADD R8, 3					; limite direito da bomba 3
+	ADD R8, LIMITE_BOMBA					; determina limite direito da bomba 3
 
 	; ver se o missil está dentro dos limites da linha da bomba
 	CMP R5, R1
@@ -1036,42 +1043,41 @@ testa_choque_3:					; testa choque com a bomba 3
 	CMP R7, R2
 	JGT testa_choque_4
 	CMP R8, R2
-	JLT testa_choque_4			; se não estiver, testa-se o choque com a bomba 4
+	JLT testa_choque_4						; se não estiver, testa-se o choque com a bomba 4
 
-	CALL apaga_bomba_3
-
-	CALL apaga_explosao
+	CALL apaga_bomba_3						; apaga a bomba que sofreu o choque
+	CALL apaga_explosao						; apaga explosao anterior se existir
 
 	MOV R1, [POS_BOMBA_3]
 	MOV R2, [POS_BOMBA_3+2]
-	MOV [POS_CHOQUE], R1
-	MOV [POS_CHOQUE+2], R2
+	MOV [POS_CHOQUE], R1					; armazena linha do choque
+	MOV [POS_CHOQUE+2], R2					; armazena coluna do choque
 
-	MOV R5, [POS_BOMBA_3+6]
-	CALL desenha_explosao
+	MOV R5, [POS_BOMBA_3+6]					; obtém estado da bomba
+	CALL desenha_explosao					; desenha explosão consoante estado da bomba
 
-	CMP R5, MINERAVEL
-	JNZ reset_3
-	MOV R4, DEF_BOMBA_MINERAVEL_EXP
-	CALL aumentar_energia
+	CMP R5, MINERAVEL						; verifica se a bomba é minerável
+	JNZ reset_3								; se sim, incrementa energia
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
+	CALL aumentar_energia					
 
-reset_3:						; repoe bomba e missil atingidos
+reset_3:									; repõe bomba e missil atingidos
 	CALL reset_bomba_3
 
-	MOV R1, LINHA_MISSIL
-	MOV R2, COLUNA_MISSIL
-	MOV R3, -1
+	MOV R1, LINHA_MISSIL					; repõe linha do míssil
+	MOV R2, COLUNA_MISSIL					; repõe coluna do míssil
+	MOV R3, DESATIVADO						; repõe estado do míssil para desativado
 	POP R6
 	POP R5
 	RET
 
-testa_choque_4:					; testa choque com a bomba 4
-	MOV R5, [POS_BOMBA_4]		; linha bomba 4
+testa_choque_4:								; testa choque com a bomba 4
+	MOV R5, [POS_BOMBA_4]					; linha bomba 4
 	MOV R6, R5
-	ADD R6, 3					; limite inferior da bomba 4
-	MOV R7, [POS_BOMBA_4+2]		; coluna bomba 4
+	ADD R6, LIMITE_BOMBA					; limite inferior da bomba 4
+	MOV R7, [POS_BOMBA_4+2]					; coluna bomba 4
 	MOV R8, R7
-	ADD R8, 3					; limite direito da bomba 4
+	ADD R8, LIMITE_BOMBA					; limite direito da bomba 4
 
 	; ver se o missil está dentro dos limites da linha da bomba
 	CMP R5, R1
@@ -1083,31 +1089,32 @@ testa_choque_4:					; testa choque com a bomba 4
 	CMP R7, R2
 	JGT fim_limites_missil		
 	CMP R8, R2
-	JLT fim_limites_missil		; se não estiver, ja se testou todos os limites 
+	JLT fim_limites_missil					; se não estiver, já se testou todos os limites 
 
-	CALL apaga_bomba_4
-
-	CALL apaga_explosao					; apaga explosao anterior se existir
+	CALL apaga_bomba_4						; apaga a bomba que sofreu um choque
+	CALL apaga_explosao						; apaga explosao anterior se existir
 
 	MOV R1, [POS_BOMBA_4]
 	MOV R2, [POS_BOMBA_4+2]
-	MOV [POS_CHOQUE], R1
+	MOV [POS_CHOQUE], R1					; armazena linha do choque
+	MOV [POS_CHOQUE+2], R2					; armazena coluna do choque
 	MOV [POS_CHOQUE+2], R2
 
-	MOV R5, [POS_BOMBA_4+6]
-	CALL desenha_explosao
+	MOV R5, [POS_BOMBA_4+6]					; obtém estado da bomba
+	CALL desenha_explosao					; desenha explosão consoante estado da bomba
 
-	CMP R5, MINERAVEL
-	JNZ reset_4
-	MOV R4, DEF_BOMBA_MINERAVEL_EXP
+
+	CMP R5, MINERAVEL 						; verifica se a bomba é minerável
+	JNZ reset_4								; se sim, incrementa energia
+	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
 	CALL aumentar_energia
 
-reset_4:						; repoe bomba e missil atingidos
+reset_4:									; repõe bomba e missil atingidos
 	CALL reset_bomba_4
 
-	MOV R1, LINHA_MISSIL
-	MOV R2, COLUNA_MISSIL
-	MOV R3, -1
+	MOV R1, LINHA_MISSIL					; repõe linha do míssil 
+	MOV R2, COLUNA_MISSIL					; repõe coluna do míssil
+	MOV R3, DESATIVADO						; repõe estado do míssil
 	POP R6
 	POP R5
 	RET
@@ -1120,7 +1127,7 @@ fim_limites_missil:
 reset_missil:
 	MOV R1, LINHA_MISSIL		; repor linha do missil 
 	MOV R2, COLUNA_MISSIL		; repor coluna do missil
-	MOV R3, -1					; repor estado do missil a parado (-1)
+	MOV R3, DESATIVADO			; repor estado do missil a parado (-1)
 	POP R6
 	POP R5
 	RET
@@ -1301,7 +1308,7 @@ move_bombas:
 	CMP R0, 0
 	JZ sai_move_bombas					; se não, sai
 
-	MOV R0, INT_BOMBAS					;assinala a interrupção de volta a zero
+	MOV R0, INT_BOMBAS					; assinala a interrupção de volta a zero
 	MOV R1, 0
 	MOV [R0], R1
 	CALL apaga_bomba_1                  ; apaga a bomba na posição antiga
@@ -1719,7 +1726,7 @@ acaba_jogo:
 
 	MOV R3, LINHA_MISSIL		
 	MOV R2, COLUNA_MISSIL
-	MOV R4, -1
+	MOV R4, DESATIVADO
 
 	MOV [POS_MISSIL_1], R3				; repor linha missil 1 à linha inicial
 	MOV [POS_MISSIL_1+2], R2			; repor coluna missil 1 à coluna inicial
@@ -2435,7 +2442,7 @@ perde_jogo:
 
 	MOV R3, LINHA_MISSIL		
 	MOV R2, COLUNA_MISSIL
-	MOV R4, -1
+	MOV R4, DESATIVADO
 
 	MOV [POS_MISSIL_1], R3				; repor linha missil 1 à linha inicial
 	MOV [POS_MISSIL_1+2], R2			; repor coluna missil 1 à coluna inicial

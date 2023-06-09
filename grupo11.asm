@@ -81,9 +81,12 @@ ESQUERDA				EQU 1
 MEIO					EQU 2
 
 ; VALORES ASSOCIADOS AOS SONS
-SOM_BOMBA			EQU 0               ; som quando a bomba se move 
-SOM_PERSONAGEM			EQU 1               ; som quando muda personagem 
-SOM_MISSIL			EQU 2               ; som quando o missil se move
+SOM_BOMBA			EQU 0               ; som quando a bomba é gerada
+SOM_PERSONAGEM		EQU 1               ; som quando muda personagem 
+SOM_MISSIL			EQU 2               ; som quando o missil se ativa
+SOM_EXPLOSAO 		EQU 3				; som quando se atinge uma bomba não minerável
+SOM_TECLADO 		EQU 4
+SOM_ENERGIA			EQU 5				; som quando se atinge bomba minerável
 REPRODUZ_SOM		EQU COMANDOS + 5AH	; endereço do comando para tocar um som
 
 ;VALORES POSSIVEIS PARA A VARIAVEL ESTADO_JOGO
@@ -206,7 +209,7 @@ INT_BOMBAS:								; variável que indica se se tem de
 	WORD 0                              ; 1 - sim, 0 - não
 
 INT_MISSIL:								; variável que indica se se tem de
-                                        ; mover os misseis
+                                        ; mover os mísseis
 	WORD 0                              ; 1 - sim, 0 - não
 COR_ARMA:                               ; variável que armazena qual a cor atual 
                                         ; da arma
@@ -471,9 +474,12 @@ chama_comando:
                                         ; a esse estado
 
 comandos_jogo_acabado:
+	MOV R7, SOM_TECLADO
+
 	MOV R1, TECLA_C				         
 	CMP R1, R0 							; compara tecla primida com a tecla C
-    JNZ testa_muda_personagem			       
+    JNZ testa_muda_personagem			
+	CALL reproduz_som       
 	JMP comeca_jogo                     ; se forem iguais, começa o jogo
 
 testa_muda_personagem:
@@ -483,18 +489,24 @@ testa_muda_personagem:
 	JMP muda_personagem					 ; se forem iguais, muda a personagem
 
 comandos_jogo_pausado:
+	MOV R7, SOM_TECLADO
+
 	MOV R1, TECLA_F  
 	CMP R1, R0                           ; compara tecla primida com a tecla F
 	JNZ testa_recomeca_jogo 
+	CALL reproduz_som
 	JMP acaba_jogo    					 ; se forem iguais, acaba o jogo
 
 testa_recomeca_jogo:
 	MOV R1, TECLA_C				         ; compara tecla primida com a tecla C
 	CMP	R1, R0				             
 	JNZ fim_chama_comando
+	CALL reproduz_som
 	JMP recomeca_jogo					 ; se forem iguais, recomeca_jogo
 
 comandos_decorrer_jogo:
+	MOV R7, SOM_TECLADO
+
 	MOV R1, TECLA_0
 	CMP R1, R0							 ; compara a tecla com a tecla 0
 	JNZ testa_missil_direita
@@ -518,12 +530,14 @@ testa_pausa_jogo:
 	MOV R1, TECLA_D
 	CMP R1, R0							 ; compara a tecla com a tecla D
 	JNZ testa_acaba_jogo
+	CALL reproduz_som
 	JMP pausa_jogo						 ; se forem iguais, pausa o jogo
 
 testa_acaba_jogo:
 	MOV R1, TECLA_F  
 	CMP R1, R0                           ; compara tecla primida com a tecla F
 	JNZ fim_chama_comando 
+	CALL reproduz_som
 	JMP acaba_jogo                       ; se forem iguais, acaba o jogo
 
 fim_chama_comando:
@@ -659,13 +673,15 @@ sai_reduzir_energia:
 ; ******************************************************************************
 aumentar_energia:
     PUSH R0
-    PUSH R1
+    PUSH R1 
     MOV  R0, ENERGIA_PERSONAGEM         ; energia atual da personagem
     MOV  R0, [R0]              			; lê energia do da personagem
 	MOV  R1, 25
     ADD  R0, R1                         ; incrementa 25 na energia da nave
     CALL atualiza_energia               ; atualiza o valor na variável e nos 
                                         ; displays
+	MOV R0, SOM_ENERGIA
+	CALL reproduz_som
 sai_aumentar_energia:
     POP R1
     POP R0
@@ -734,12 +750,12 @@ converte:                               ; converte o valor da energia
 muda_personagem: 
 	PUSH R0
 	PUSH R1		
-	PUSH R3
+	PUSH R5
 	MOV R0, [ESTADO_PERSONAGEM]         ; obtém personagem atual
 	MOV R1, RAPAZ   
 	CMP R1, R0                          ; verifica se é o rapaz
 	JZ muda_rapaz                       ; se sim, muda-o para a rapariga
-	MOV R3, SOM_PERSONAGEM		        ; som de mudar personagem
+	MOV R7, SOM_PERSONAGEM		        ; som de mudar personagem
 	CALL reproduz_som                   ; reproduz som de mudar personagem
 	
 muda_rapariga:                          ; muda a rapariga para o rapaz
@@ -747,7 +763,7 @@ muda_rapariga:                          ; muda a rapariga para o rapaz
 	CALL desenha_rapaz                  ; desenha nova personagem (rapaz)
 	MOV R2, RAPAZ                       
 	MOV [ESTADO_PERSONAGEM], R2         ; atualiza estado da personagem
-	POP R3
+	POP R5
 	POP R1
 	POP R0
 	JMP fim_chama_comando
@@ -810,7 +826,7 @@ fim_atualiza_posicao:
 	POP R5
 	RET
 ; ******************************************************************************
-; atira_missil - Ativa os misseis, passando-os de um estado parado (0) para 
+; atira_missil - Ativa os mísseis, passando-os de um estado parado (0) para 
 ;				 movimento, de acordo com a direção escolhida.
 ; ******************************************************************************
 atira_missil_esquerda:
@@ -927,6 +943,7 @@ testa_choque_1:					; testa choque com a bomba 1
 								; apaga o missil que sofreu o choque
 
 	CALL apaga_explosao
+
 
 	MOV R1, [POS_BOMBA_1]
 	MOV R2, [POS_BOMBA_1+2]
@@ -1149,7 +1166,7 @@ apaga_explosao_fim:
 	RET
 
 ; ******************************************************************************
-; move_missil - Move os misseis ativos uma linha para cima consoante a sua 
+; move_missil - Move os mísseis ativos uma linha para cima consoante a sua 
 ;				direção:
 ;				- Direita: Uma linha para cima e duas colunas para a direita
 ;				- Esquerda: Uma linha para cima e duas colunas para a esquerda
@@ -1190,8 +1207,6 @@ move_misseis:
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
 
-	CALL reproduz_som	                ; reproduz som do missil
-
 	CALL testa_limites_missil
 
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
@@ -1211,8 +1226,6 @@ move_missel_2:
 	MOV [POS_MISSIL_2], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_2+2], R2            ; atualiza valor da colunas
 
-	CALL reproduz_som	                ; reproduz som do missil
-
 	CALL testa_limites_missil
 
 	MOV [POS_MISSIL_2], R1              ; atualiza valor da linha
@@ -1231,8 +1244,6 @@ move_missel_3:
 
 	MOV [POS_MISSIL_3], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_3+2], R2            ; atualiza valor da colunas
-
-	CALL reproduz_som	                ; reproduz som do missil
 
 	CALL testa_limites_missil
 
@@ -1297,8 +1308,6 @@ move_bombas:
 
 	MOV [POS_BOMBA_1], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_1+2], R2             ; atualiza valor da colunas
-
-	CALL reproduz_som	                ; reproduz som da bomba
 	
 	CALL testa_limites_bomba			; vê se a nova posição ultrapassa limites
 	MOV [POS_BOMBA_1], R1               ; atualiza valor da linha
@@ -1321,9 +1330,6 @@ move_bomba_2:
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
 
-	CALL reproduz_som	                ; reproduz som da bomba
-
-
 	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
 	MOV [POS_BOMBA_2], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_2+2], R2             ; atualiza valor da colunas
@@ -1345,8 +1351,6 @@ move_bomba_3:
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
 
-	CALL reproduz_som	                ; reproduz som da bomba
-
 	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
 	MOV [POS_BOMBA_3], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_3+2], R2             ; atualiza valor da colunas
@@ -1367,8 +1371,6 @@ move_bomba_4:
 
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
 	MOV [POS_BOMBA_4+2], R2             ; atualiza valor da colunas
-
-	CALL reproduz_som	                ; reproduz som da bomba
 
 	CALL testa_limites_bomba			; vê se a nova polsição ultrapassa limites
 	MOV [POS_BOMBA_4], R1               ; atualiza valor da linha
@@ -1518,6 +1520,7 @@ reset_bomba_4:
 
 reset_bomba:
 	PUSH R4
+	PUSH R7
 	PUSH R10
 	PUSH R11
 	CALL gerador_posicao			; gera um número aleatório em R11
@@ -1528,6 +1531,8 @@ reset_bomba:
 	MOV R1, LINHA_BOMBA_ESQ			; atualiza a linha e coluna da bomba para
 	MOV R2, COLUNA_BOMBA_ESQ		; a inicial
 	MOV R3, DIREITA
+	MOV R7, SOM_BOMBA
+	CALL reproduz_som
 	JMP	define_estado
 
 testa_meio_esquerdo:					
@@ -1568,6 +1573,7 @@ define_estado:
 fim_reset_bomba:
 	POP R11
 	POP R10
+	POP R7
 	POP R4
 	RET
 
@@ -1668,7 +1674,7 @@ acaba_jogo:
 	MOV R4, JOGO_ACABADO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para acabadp
 	CALL apaga_bombas			        ; apaga as bombas do ecrã
-	CALL apaga_misseis			        ; apaga o missil do ecrã
+	CALL apaga_misseis			        ; apaga o míssil do ecrã
 
 	MOV R2, LINHA_BOMBA_ESQ		
 	MOV [POS_BOMBA_1], R2				; repor linha bomba 1 à linha inicial
@@ -1769,12 +1775,10 @@ fim_reset_energia:
 ; Argumentos - R0 - Número do som a reproduzir
 ; ******************************************************************************
 reproduz_som:
-    PUSH R0
     PUSH R1
     MOV R1, REPRODUZ_SOM				; 
-    MOV [R1], R0
+    MOV [R1], R7
     POP R1
-    POP R0
     RET
 
 ; ******************************************************************************
@@ -1916,7 +1920,7 @@ apaga_bomba_1:
 	PUSH R2
 	PUSH R4
 	MOV R1, [POS_BOMBA_1] 		        ; linha atual da bomba
-	MOV R2, [POS_BOMBA_1+2] 		        ; coluna atual da bomba
+	MOV R2, [POS_BOMBA_1+2] 		    ; coluna atual da bomba
 	MOV R4, DEF_BOMBA_APAGADA           ; definição da bomba apagada 
 	CALL desenha_boneco
 	POP R4

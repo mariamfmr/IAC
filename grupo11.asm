@@ -572,6 +572,7 @@ rot_int_arma_explosao:
     MOV  [R0], R1
 	MOV  R0, INT_EXPLOSAO 
 	MOV [R0], R1
+	CALL apaga_explosao
     POP  R1
     POP  R0			
     RFE

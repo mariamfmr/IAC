@@ -69,12 +69,12 @@ ALTURA_BOMBA			EQU	 4          ; altura do desenho da bomba
 
 LIMITE_BOMBA 			EQU  3			; limites da bomba consoante largura
 
-LINHA_MISSIL		  	EQU  21 	    ; linha inicial do missil
-COLUNA_MISSIL		 	EQU  33 	    ; coluna inicial do missil
-LARGURA_MISSIL		 	EQU  1          ; largura do desenho do missil
-ALTURA_MISSIL		 	EQU  1          ; altura do desenho do missil
+LINHA_MISSIL		  	EQU  21 	    ; linha inicial do míssil
+COLUNA_MISSIL		 	EQU  33 	    ; coluna inicial do míssil
+LARGURA_MISSIL		 	EQU  1          ; largura do desenho do míssil
+ALTURA_MISSIL		 	EQU  1          ; altura do desenho do míssil
 ; VALOR ASSOCIADO AO ESTADO DO MISSIL
-DESATIVADO 				EQU -1			; estado desativado do missil
+DESATIVADO 				EQU -1			; estado desativado do míssil
 
 ; VALORES ASSOCIADOS AOS LIMITES DAS BOMBAS COM O ECRÃ E COM A PERSONAGEM
 LIM_COL_PERSONAGEM_ESQ	EQU 34			; limite coluna bomba com personagem
@@ -88,7 +88,7 @@ LIM_LIN_PERSONAGEM_MEIO EQU 17			; limite linha bomba com personagem
 NAO_MINERAVEL			EQU  0			; valor associado às bombas não mineraveis
 MINERAVEL				EQU	 1			; valor associado às bombas mineraveis
 
-; VALOREES ASSOCIADOS À DIREÇÃO DAS BOMBAS E MISSEIS
+; VALORES ASSOCIADOS À DIREÇÃO DAS BOMBAS E MISSEIS
 DIREITA 				EQU 0			
 ESQUERDA				EQU 1
 MEIO					EQU 2
@@ -100,7 +100,7 @@ LIMITE_SUPERIOR			EQU -1			; limite superior das linhas do ecrã
 
 ; VALORES ASSOCIADOS AOS SONS
 SOM_PERSONAGEM		EQU 0               ; som quando muda personagem 
-SOM_MISSIL			EQU 1               ; som quando o missil se ativa
+SOM_MISSIL			EQU 1               ; som quando o míssil se ativa
 SOM_EXPLOSAO 		EQU 2				; som quando se atinge uma bomba não minerável
 SOM_TECLADO 		EQU 3				; som quando se pressiona certas teclas
 SOM_ENERGIA			EQU 4				; som quando se atinge bomba minerável
@@ -193,22 +193,22 @@ POS_BOMBA_4:                            ; variável que armazena a posição atu
 	WORD NAO_MINERAVEL					; valor da bomba não minerável
 
 POS_MISSIL_1:                           ; variável que armazena a posição atual
-                                        ; do missil
-	WORD LINHA_MISSIL  		            ; valor da linha atual do missil
-	WORD COLUNA_MISSIL	                ; valor da coluna atual do missil
-	WORD DESATIVADO								; valor associado à direção do missil
+                                        ; do míssil
+	WORD LINHA_MISSIL  		            ; valor da linha atual do míssil
+	WORD COLUNA_MISSIL	                ; valor da coluna atual do míssil
+	WORD DESATIVADO						; valor associado à direção do míssil
 
 POS_MISSIL_2:                           ; variável que armazena a posição atual
-                                        ; do missil 2
-	WORD LINHA_MISSIL	                ; valor da linha atual do missil
-	WORD COLUNA_MISSIL	                ; valor da coluna atual do missil
-	WORD DESATIVADO								; valor associado à direção do missil
+                                        ; do míssil 2
+	WORD LINHA_MISSIL	                ; valor da linha atual do míssil
+	WORD COLUNA_MISSIL	                ; valor da coluna atual do míssil
+	WORD DESATIVADO						; valor associado à direção do míssil
 
 POS_MISSIL_3:                           ; variável que armazena a posição atual
-                                        ; do missil 3
-	WORD LINHA_MISSIL	                ; valor da linha atual do missil
-	WORD COLUNA_MISSIL	                ; valor da coluna atual do missil
-	WORD DESATIVADO						; valor associado à direção do missil
+                                        ; do míssil 3
+	WORD LINHA_MISSIL	                ; valor da linha atual do míssil
+	WORD COLUNA_MISSIL	                ; valor da coluna atual do míssil
+	WORD DESATIVADO						; valor associado à direção do míssil
 
 POS_ARMA:								; variável que armazena posição da arma
 	WORD LINHA_ARMA
@@ -222,7 +222,7 @@ ESTADO_PERSONAGEM:                      ; variável que armazena qual das
                                         ; personagens foi selecionada para o jogo
 	WORD RAPAZ 			                ; valor da personagem atual
 
-ENERGIA_PERSONAGEM:                         ; valor associado à energia (display)
+ENERGIA_PERSONAGEM:                     ; valor associado à energia (display)
 	WORD 0         	 	                ; valor atual da energia
 
 INT_ARMA:                           	; variável que indica se se tem de
@@ -322,7 +322,7 @@ DEF_RAPARIGA:                           ; desenho da 2ª opção de personagem 1
                 COR_VERMELHO_CLARO, COR_PRETO, COR_PRETO, COR_CINZENTO, 
                 COR_CINZENTO, COR_PRETO, COR_BEGE, COR_BEGE, COR_PRETO, 0, 0, 0, 0 
 
-DEF_PERSONAGEM_APAGADA:                 ; desenho da personagem apagada 11x20
+DEF_PERSONAGEM_APAGADA:                 	; desenho da personagem apagada 11x20
 	WORD        LARGURA_PERSONAGEM
 	WORD        ALTURA_PERSONAGEM
 	WORD        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -337,50 +337,50 @@ DEF_PERSONAGEM_APAGADA:                 ; desenho da personagem apagada 11x20
 		        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-DEF_BOMBA:                              ; desenho da bomba 4x4
+DEF_BOMBA:                             		 ; desenho da bomba 4x4
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
 	WORD		0, COR_PRETO, COR_PRETO, 0, COR_PRETO, COR_VERMELHO, COR_BRANCO, 
 				COR_VERMELHO, COR_PRETO, COR_BRANCO, COR_CINZENTO, COR_PRETO, 0, 
 				COR_PRETO, COR_PRETO, 0
 
-DEF_BOMBA_EXPLODIDA:                     ; desenho da bomba 4x4
+DEF_BOMBA_EXPLODIDA:                    	 ; desenho da bomba explodida 4x4
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
 	WORD		0, COR_VERMELHO, COR_VERMELHO, 0, COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, 
 				COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, COR_VERMELHO, 0, COR_VERMELHO, 
 				COR_VERMELHO, 0
 
-DEF_BOMBA_MINERAVEL:
+DEF_BOMBA_MINERAVEL:						; desenho da bomba minerável 4x4			
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
 	WORD		0, COR_PRETO, COR_PRETO, 0, COR_PRETO, COR_VERDE, COR_BRANCO, 
 				COR_VERDE, COR_PRETO, COR_BRANCO, COR_CINZENTO, COR_PRETO, 0, 
 				COR_PRETO, COR_PRETO, 0
 
-DEF_BOMBA_MINERAVEL_EXP:                  ; desenho da bomba 4x4
+DEF_BOMBA_MINERAVEL_EXP:                  	; desenho da bomba minerável explodida 4x4
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
 	WORD		0, COR_VERDE, COR_VERDE, 0, COR_VERDE, COR_VERDE, COR_VERDE, 
 				COR_VERDE, COR_VERDE, COR_VERDE, COR_VERDE, COR_VERDE, 0, COR_VERDE, 
 				COR_VERDE, 0
 
-DEF_BOMBA_APAGADA:                       ; desenho da bomba apagada 4x4
+DEF_BOMBA_APAGADA:                       	; desenho da bomba apagada 4x4
 	WORD 		LARGURA_BOMBA
 	WORD		ALTURA_BOMBA
 	WORD        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-DEF_MISSIL:                              ; desenho do missil 1x1
+DEF_MISSIL:                              	; desenho do míssil 1x1
 	WORD		LARGURA_MISSIL
 	WORD		ALTURA_MISSIL
 	WORD		COR_AMARELO
 
-DEF_MISSIL_APAGADO:                      ; desenho do missil apagado 1x1
+DEF_MISSIL_APAGADO:                      	; desenho do míssil apagado 1x1
 	WORD		LARGURA_MISSIL
 	WORD		ALTURA_MISSIL
 	WORD		0
 
-DEF_ARMA_APAGADA:                        ; desenho da arma apagada 5x9
+DEF_ARMA_APAGADA:                        	; desenho da arma apagada 5x9
 	WORD		LARGURA_ARMA
 	WORD   		ALTURA_ARMA
 	WORD		COR_PRETO, 0, 0, COR_PRETO, 0, COR_PRETO, COR_PRETO, COR_PRETO, 0,
@@ -389,7 +389,7 @@ DEF_ARMA_APAGADA:                        ; desenho da arma apagada 5x9
 				COR_PRETO, 0, 0, COR_PRETO, COR_PRETO, COR_PRETO, 0, COR_PRETO, 
                 COR_PRETO, 0, 0, COR_PRETO, COR_BEGE, COR_BEGE, COR_PRETO, 0, 0, 0
 
-DEF_ARMA_BRANCA:                         ; desenho da arma branca 5x9
+DEF_ARMA_BRANCA:                         	; desenho da arma branca 5x9
 	WORD		LARGURA_ARMA
 	WORD   		ALTURA_ARMA
 	WORD		COR_PRETO, 0, 0, COR_PRETO, COR_BRANCO, COR_PRETO, COR_PRETO, 
@@ -401,8 +401,8 @@ DEF_ARMA_BRANCA:                         ; desenho da arma branca 5x9
                 COR_BRANCO, COR_PRETO, COR_BEGE, COR_BEGE, COR_PRETO, 0, 0, 0
 
 
-DEF_ARMA_CINZENTA:                       ; desenho da arma cinzenta 5x9
-	WORD		LARGURA_ARMA
+DEF_ARMA_CINZENTA:                       	; desenho da arma cinzenta 5x9
+	WORD		LARGURA_ARMA	
 	WORD   		ALTURA_ARMA
 	WORD		COR_PRETO, 0, 0, COR_PRETO, COR_CINZENTO, COR_PRETO, COR_PRETO, COR_PRETO, 0,
 				COR_PRETO, 0, COR_PRETO, COR_CINZENTO, COR_CINZENTO, COR_PRETO, COR_CINZENTO, 
@@ -460,9 +460,9 @@ ciclo:
 ;                 sim, chama a rotina adequada.
 ;
 ; Comandos:
-; 0: atirar missil para a esquerda
-; 2: atirar missil para a direita
-; 5: atirar missil para cima
+; 0: atirar míssil para a esquerda
+; 2: atirar míssil para a direita
+; 5: atirar míssil para cima
 ; D: pausar jogo
 ; C: começar jogo
 ; E: alterar personagem
@@ -518,7 +518,7 @@ testa_muda_personagem:
 	JMP muda_personagem					 ; se forem iguais, muda a personagem
 
 comandos_jogo_pausado:
-	MOV R7, SOM_TECLADO					; obtém som do teclado
+	MOV R7, SOM_TECLADO					 ; obtém som do teclado
 
 	MOV R1, TECLA_F  
 	CMP R1, R0                           ; compara tecla primida com a tecla F
@@ -539,19 +539,19 @@ comandos_decorrer_jogo:
 	MOV R1, TECLA_0
 	CMP R1, R0							 ; compara a tecla com a tecla 0
 	JNZ testa_missil_direita
-	JMP atira_missil_esquerda			 ; se forem iguais, atira um missil
+	JMP atira_missil_esquerda			 ; se forem iguais, atira um míssil
 										 ; para a esquerda	            
  testa_missil_direita:
 	MOV R1, TECLA_2
 	CMP R1, R0							 ; compara a tecla com a tecla 2
 	JNZ testa_missil_cima
-	JMP atira_missil_direita			 ; se forem iguais, atira um missil
+	JMP atira_missil_direita			 ; se forem iguais, atira um míssil
 										 ; para a direita
 testa_missil_cima:
 	MOV R1, TECLA_5
 	CMP R1, R0						     ; compara a tecla com a tecla 5
 	JNZ testa_pausa_jogo
-	JMP atira_missil_cima				 ; se forem iguais, atira um missil
+	JMP atira_missil_cima				 ; se forem iguais, atira um míssil
 										 ; para cima
 testa_pausa_jogo:
 	MOV R1, TECLA_D
@@ -822,7 +822,7 @@ muda_rapaz:
 ; ******************************************************************************
 atualiza_posicao_missil:
 	PUSH R5
-	MOV R5, -1								; verifica se missil está desativado
+	MOV R5, -1								; verifica se míssil está desativado
 	CMP R5, R3								
 	JZ fim_atualiza_posicao					; se sim, sai	
 
@@ -865,17 +865,17 @@ fim_atualiza_posicao:
 ; ******************************************************************************
 atira_missil_esquerda:
 	PUSH R5
-	MOV R5, ESQUERDA						; valor a colocar caso haja algum missil parado
+	MOV R5, ESQUERDA						; valor a colocar caso haja algum míssil parado
 	JMP procura_missil_parado
 
 atira_missil_cima:
 	PUSH R5
-	MOV R5, MEIO							; valor a colocar caso haja algum missil parado
+	MOV R5, MEIO							; valor a colocar caso haja algum míssil parado
 	JMP procura_missil_parado	
 	
 atira_missil_direita:
 	PUSH R5
-	MOV R5, DIREITA							; valor a colocar caso haja algum missil parado
+	MOV R5, DIREITA							; valor a colocar caso haja algum míssil parado
 	JMP procura_missil_parado
 
 procura_missil_parado:
@@ -888,39 +888,39 @@ procura_missil_parado:
 
 	MOV R1, -1								; estado parado a comparar
 	MOV R3, [POS_MISSIL_1+4]
-	CMP R1, R3								; compara estado atual do missil 1
+	CMP R1, R3								; compara estado atual do míssil 1
 	JZ ativa_missil_1						; caso esteja parado, ativa-o
 
 	MOV R1, -1
 	MOV R3, [POS_MISSIL_2+4]
-	CMP R1, R3								; compara estado atual do missil 2
+	CMP R1, R3								; compara estado atual do míssil 2
 	JZ ativa_missil_2						; caso esteja parado, ativa-o
 
 	MOV R1, -1
 	MOV R3, [POS_MISSIL_3+4]
-	CMP R1, R3								; compara estado atual do missil 3
+	CMP R1, R3								; compara estado atual do míssil 3
 	JZ ativa_missil_3						; caso esteja parado, ativa-o
 
 	MOV R1, LINHA_MISSIL
 	MOV R2, COLUNA_MISSIL
 
-	JMP fim_ativa_missil					; se nenhum missil estiver ativo, vai para 
+	JMP fim_ativa_missil					; se nenhum míssil estiver ativo, vai para 
 											; o fim do comando
 
 ativa_missil_1:
-	CALL reproduz_som						; reproduz som do missil disparado
+	CALL reproduz_som						; reproduz som do míssil disparado
 	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 1
 	MOV [POS_MISSIL_1+4], R5				; atualiza direção com valor escolhido
 	JMP fim_ativa_missil
 
 ativa_missil_2:
-	CALL reproduz_som						; reproduz som do missil disparado
+	CALL reproduz_som						; reproduz som do míssil disparado
 	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 2
 	MOV [POS_MISSIL_2+4], R5				; atualiza direção com valor escolhido
 	JMP fim_ativa_missil
 
 ativa_missil_3:
-	CALL reproduz_som						; reproduz som do missil disparado
+	CALL reproduz_som						; reproduz som do míssil disparado
 	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 3
 	MOV [POS_MISSIL_3+4], R5				; atualiza direção com valor escolhido
 
@@ -933,30 +933,30 @@ fim_ativa_missil:
 	JMP fim_chama_comando
 
 ; ******************************************************************************
-; testa_limites_missil - Testa a posição do missil atual e vê se ultrapassou os
+; testa_limites_missil - Testa a posição do míssil atual e vê se ultrapassou os
 ;						 limites do ecrã ou se ocorreu um choque.
 ;
-; Argumentos: R1 - valor da linha atual do missil
-;			  R2 - valor da coluna atual do missil
-;			  R3 - direção em que o missil vai subir
+; Argumentos: R1 - valor da linha atual do míssil
+;			  R2 - valor da coluna atual do míssil
+;			  R3 - direção em que o míssil vai subir
 ; ******************************************************************************
 testa_limites_missil:
 	PUSH R5
 	PUSH R6
 	MOV R6, LIMITE_ESQUERDO					; valor do  limite esquerdo	(-1)
-	CMP R6, R2								; ver se o missil ultrapassou esse limite	
+	CMP R6, R2								; ver se o míssil ultrapassou esse limite	
 	JNZ	limite_direito
 	JMP reset_missil						; se sim, repõe-o
 
 limite_direito:
 	MOV R6, LIMITE_DIREITO					; valor do limite direito (64)
-	CMP R6, R2								; ver se o missil ultrapassou esse limite	
+	CMP R6, R2								; ver se o míssil ultrapassou esse limite	
 	JNZ limite_superior	
 	JMP reset_missil						; se sim, repõe-o
 
 limite_superior:
 	MOV R6, LIMITE_SUPERIOR					; valor do limite superior (-1)
-	CMP R6, R1								; ver se o missil ultrapassou esse limite	
+	CMP R6, R1								; ver se o míssil ultrapassou esse limite	
 	JNZ testa_choque_1						; se não, verifica se houve choque
 	JMP reset_missil						; se sim, repõe-o
 
@@ -969,13 +969,13 @@ testa_choque_1:								; testa choque com a bomba 1
 	MOV R8, R7					
 	ADD R8, LIMITE_BOMBA					; determmina limite direito da bomba 1
 
-	; ver se o missil está dentro dos limites da linha da bomba 1
+	; ver se o míssil está dentro dos limites da linha da bomba 1
 	CMP R5, R1					
 	JGT testa_choque_2
 	CMP R6, R1
 	JLT testa_choque_2
 
-	; ver se o missil esta dentro dos limites da coluna da bomba 1
+	; ver se o míssil esta dentro dos limites da coluna da bomba 1
 	CMP R7, R2
 	JGT testa_choque_2
 	CMP R8, R2
@@ -1044,7 +1044,7 @@ testa_choque_2:								; testa choque com a bomba 2
 	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
 	CALL aumentar_energia					
 
-reset_2:									; repoe bomba e missil atingidos
+reset_2:									; repõe bomba e míssil atingidos
 	CALL reset_bomba_2
 
 	MOV R1, LINHA_MISSIL					; repõe linha do míssil 
@@ -1090,7 +1090,7 @@ testa_choque_3:								; testa choque com a bomba 3
 	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
 	CALL aumentar_energia					
 
-reset_3:									; repõe bomba e missil atingidos
+reset_3:									; repõe bomba e míssil atingidos
 	CALL reset_bomba_3
 
 	MOV R1, LINHA_MISSIL					; repõe linha do míssil
@@ -1108,13 +1108,13 @@ testa_choque_4:								; testa choque com a bomba 4
 	MOV R8, R7
 	ADD R8, LIMITE_BOMBA					; limite direito da bomba 4
 
-	; ver se o missil está dentro dos limites da linha da bomba
+	; ver se o míssil está dentro dos limites da linha da bomba
 	CMP R5, R1
 	JGT fim_limites_missil
 	CMP R6, R1
 	JLT fim_limites_missil
 
-	; ver se o missil esta dentro dos limites da coluna da bomba
+	; ver se o míssil esta dentro dos limites da coluna da bomba
 	CMP R7, R2
 	JGT fim_limites_missil		
 	CMP R8, R2
@@ -1138,7 +1138,7 @@ testa_choque_4:								; testa choque com a bomba 4
 	MOV R4, DEF_BOMBA_MINERAVEL_EXP			; obtém a definição de uma bomba minerável explodida
 	CALL aumentar_energia
 
-reset_4:									; repõe bomba e missil atingidos
+reset_4:									; repõe bomba e míssil atingidos
 	CALL reset_bomba_4
 
 	MOV R1, LINHA_MISSIL					; repõe linha do míssil 
@@ -1154,9 +1154,9 @@ fim_limites_missil:
 	RET
 
 reset_missil:
-	MOV R1, LINHA_MISSIL					; repõe linha do missil 
-	MOV R2, COLUNA_MISSIL					; repõe coluna do missil
-	MOV R3, DESATIVADO						; repõe estado do missil a parado (-1)
+	MOV R1, LINHA_MISSIL					; repõe linha do míssil 
+	MOV R2, COLUNA_MISSIL					; repõe coluna do míssil
+	MOV R3, DESATIVADO						; repõe estado do míssil a parado (-1)
 	POP R6
 	POP R5
 	RET
@@ -1246,10 +1246,10 @@ move_misseis:
 	MOV R1, 0
 	MOV [R0], R1
 
-	CALL apaga_missil_1                 ; apaga o missil na posição antiga
+	CALL apaga_missil_1                 ; apaga o míssil na posição antiga
 	MOV R1, [POS_MISSIL_1]				; obtém linha atual
 	MOV R2, [POS_MISSIL_1+2]            ; obtém coluna atual
-	MOV R3, [POS_MISSIL_1+4]            ; obtém direção do missil
+	MOV R3, [POS_MISSIL_1+4]            ; obtém direção do míssil
 
 	CALL atualiza_posicao_missil		; atualiza posição do míssil
 
@@ -1261,15 +1261,15 @@ move_misseis:
 
 	MOV [POS_MISSIL_1], R1              ; atualiza valor da linha
 	MOV [POS_MISSIL_1+2], R2            ; atualiza valor da colunas
-	MOV [POS_MISSIL_1+4], R3            ; atualiza estado do missil
+	MOV [POS_MISSIL_1+4], R3            ; atualiza estado do míssil
 
 	CALL desenha_missil_1               ; desenha míssil na nova posição
 
 move_missil_2:
-	CALL apaga_missil_2                 ; apaga o missil na posição antiga
+	CALL apaga_missil_2                 ; apaga o míssil na posição antiga
 	MOV R1, [POS_MISSIL_2]				; obtém a linha atual do míssil
 	MOV R2, [POS_MISSIL_2+2]            ; obtém coluna atual do míssil
-	MOV R3, [POS_MISSIL_2+4]            ; obtém direção do missil
+	MOV R3, [POS_MISSIL_2+4]            ; obtém direção do míssil
 
 	CALL atualiza_posicao_missil		; atualiza a posição do míssil
 
@@ -1281,15 +1281,15 @@ move_missil_2:
 
 	MOV [POS_MISSIL_2], R1              ; atualiza valor da linha do míssil
 	MOV [POS_MISSIL_2+2], R2            ; atualiza valor da colunas do míssil
-	MOV [POS_MISSIL_2+4], R3            ; atualiza estado do missil
+	MOV [POS_MISSIL_2+4], R3            ; atualiza estado do míssil
 
-	CALL desenha_missil_2               ; desenha missil na nova posição
+	CALL desenha_missil_2               ; desenha míssil na nova posição
 
 move_missil_3:
-	CALL apaga_missil_3                 ; apaga o missil na posição antiga
+	CALL apaga_missil_3                 ; apaga o míssil na posição antiga
 	MOV R1, [POS_MISSIL_3]				; obtém linha atual do míssil
 	MOV R2, [POS_MISSIL_3+2]            ; obtém coluna atual do míssil
-	MOV R3, [POS_MISSIL_3+4]            ; obtém direção do missil
+	MOV R3, [POS_MISSIL_3+4]            ; obtém direção do míssil
 
 	CALL atualiza_posicao_missil		; atualiza posição do míssil
 
@@ -1301,9 +1301,9 @@ move_missil_3:
 
 	MOV [POS_MISSIL_3], R1              ; atualiza valor da linha do míssil
 	MOV [POS_MISSIL_3+2], R2            ; atualiza valor da colunas do míssil
-	MOV [POS_MISSIL_3+4], R3            ; atualiza estado do missil
+	MOV [POS_MISSIL_3+4], R3            ; atualiza estado do míssil
 
-	CALL desenha_missil_3               ; desenha missil na nova posição
+	CALL desenha_missil_3               ; desenha míssil na nova posição
 
 sai_move_misseis:
 	POP R9
@@ -1794,7 +1794,7 @@ gerador_mineravel:
 		POP R0
 		RET
 ; ******************************************************************************
-; gerador_posicao - gera valores pseudo-aleatórios para escolher a posicao de uma
+; gerador_posicao - Gera valores pseudo-aleatórios para escolher a posição de uma
 ;					bomba.
 ;					(0- esquerda 1- meio esquerda  2- meio baixo 3- meio direta 
 ;					 4-	direita)
@@ -1821,7 +1821,7 @@ fim_gerador_posicao:
 
 ; ******************************************************************************
 ; apaga_misseis - Apaga todos os mísseis no ecrã.
-; apaga_missil - Apaga o missil na sua posição atual.
+; apaga_missil - Apaga o míssil na sua posição atual.
 ; ******************************************************************************
 apaga_misseis:	
 	CALL apaga_missil_1					; apaga míssil 1
@@ -1833,9 +1833,9 @@ apaga_missil_1:
 	PUSH R1
 	PUSH R2
 	PUSH R4
-	MOV R1, [POS_MISSIL_1] 		        ; obtém linha atual do missil 1
-	MOV R2, [POS_MISSIL_1+2] 		    ; obtém coluna atual do missil 1
-	MOV R4, DEF_MISSIL_APAGADO	        ; obtém definição do missil apagado 
+	MOV R1, [POS_MISSIL_1] 		        ; obtém linha atual do míssil 1
+	MOV R2, [POS_MISSIL_1+2] 		    ; obtém coluna atual do míssil 1
+	MOV R4, DEF_MISSIL_APAGADO	        ; obtém definição do míssil apagado 
 	CALL desenha_boneco					; desenha míssil apagado
 	POP R4
 	POP R2
@@ -1846,9 +1846,9 @@ apaga_missil_2:
 	PUSH R1
 	PUSH R2
 	PUSH R4
-	MOV R1, [POS_MISSIL_2] 		        ; obtém linha atual do missil 2
-	MOV R2, [POS_MISSIL_2+2] 		    ; obtém coluna atual do missil 2
-	MOV R4, DEF_MISSIL_APAGADO	        ; obtém definição do missil apagado 
+	MOV R1, [POS_MISSIL_2] 		        ; obtém linha atual do míssil 2
+	MOV R2, [POS_MISSIL_2+2] 		    ; obtém coluna atual do míssil 2
+	MOV R4, DEF_MISSIL_APAGADO	        ; obtém definição do míssil apagado 
 	CALL desenha_boneco					; desenha míssil apagado
 	POP R4
 	POP R2 
@@ -1859,9 +1859,9 @@ apaga_missil_3:
 	PUSH R1
 	PUSH R2
 	PUSH R4
-	MOV R1, [POS_MISSIL_3] 		        ; obtém linha atual do missil 3
-	MOV R2, [POS_MISSIL_3+2] 		    ; obtém coluna atual do missil 3
-	MOV R4, DEF_MISSIL_APAGADO	        ; obtém definição do missil apagado 
+	MOV R1, [POS_MISSIL_3] 		        ; obtém linha atual do míssil 3
+	MOV R2, [POS_MISSIL_3+2] 		    ; obtém coluna atual do míssil 3
+	MOV R4, DEF_MISSIL_APAGADO	        ; obtém definição do míssil apagado 
 	CALL desenha_boneco					; desenha míssil apagado
 	POP R4
 	POP R2
@@ -1980,15 +1980,15 @@ desenha_rapariga:
 	RET
 
 ; ******************************************************************************
-; desenha_missil - Desenha o missil na sua posição definida.
+; desenha_missil - Desenha o míssil na sua posição definida.
 ; ******************************************************************************
 desenha_missil_1:
 	PUSH R1
 	PUSH R2
 	PUSH R4
-	MOV R1, [POS_MISSIL_1] 		        ; obtém linha atual do missil 1
-	MOV R2, [POS_MISSIL_1+2] 		    ; obtém coluna atual do missil 1
-	MOV R4, DEF_MISSIL			        ; obtém definição do missil 1
+	MOV R1, [POS_MISSIL_1] 		        ; obtém linha atual do míssil 1
+	MOV R2, [POS_MISSIL_1+2] 		    ; obtém coluna atual do míssil 1
+	MOV R4, DEF_MISSIL			        ; obtém definição do míssil 1
 	CALL desenha_boneco					; desenha míssil 1
 	POP R4
 	POP R2
@@ -1999,9 +1999,9 @@ desenha_missil_2:
 	PUSH R1
 	PUSH R2
 	PUSH R4
-	MOV R1, [POS_MISSIL_2] 		        ; obtém linha atual do missil 2
-	MOV R2, [POS_MISSIL_2+2] 		    ; obtém coluna atual do missil 2
-	MOV R4, DEF_MISSIL			        ; obtém definição do missil 2
+	MOV R1, [POS_MISSIL_2] 		        ; obtém linha atual do míssil 2
+	MOV R2, [POS_MISSIL_2+2] 		    ; obtém coluna atual do míssil 2
+	MOV R4, DEF_MISSIL			        ; obtém definição do míssil 2
 	CALL desenha_boneco					; desenha míssil 2
 	POP R4
 	POP R2
@@ -2012,9 +2012,9 @@ desenha_missil_3:
 	PUSH R1
 	PUSH R2
 	PUSH R4
-	MOV R1, [POS_MISSIL_3] 		        ; obtém linha atual do missil 3
-	MOV R2, [POS_MISSIL_3+2] 		    ; obtém coluna atual do missil 3
-	MOV R4, DEF_MISSIL			        ; obtém definição do missil 3
+	MOV R1, [POS_MISSIL_3] 		        ; obtém linha atual do míssil 3
+	MOV R2, [POS_MISSIL_3+2] 		    ; obtém coluna atual do míssil 3
+	MOV R4, DEF_MISSIL			        ; obtém definição do míssil 3
 	CALL desenha_boneco					; desenha míssil 3
 	POP R4
 	POP R2
@@ -2398,16 +2398,16 @@ repor_misseis_bombas:
 	MOV R2, COLUNA_MISSIL				; obtém coluna inicial dos mísseis
 	MOV R4, DESATIVADO					; obtém estado inicial dos mísseis
 
-	MOV [POS_MISSIL_1], R3				; repõe linha do missil 1 à linha inicial
-	MOV [POS_MISSIL_1+2], R2			; repõe coluna do missil 1 à coluna inicial
+	MOV [POS_MISSIL_1], R3				; repõe linha do míssil 1 à linha inicial
+	MOV [POS_MISSIL_1+2], R2			; repõe coluna do míssil 1 à coluna inicial
 	MOV [POS_MISSIL_1+4], R4			; repõe estado do míssil 1 a desativado
 	
-	MOV [POS_MISSIL_2], R3				; repõe linha missil 2 à linha inicial
-	MOV [POS_MISSIL_2+2], R2			; repõe coluna missil 2 à coluna inicial
+	MOV [POS_MISSIL_2], R3				; repõe linha míssil 2 à linha inicial
+	MOV [POS_MISSIL_2+2], R2			; repõe coluna míssil 2 à coluna inicial
 	MOV [POS_MISSIL_2+4], R4			; repõe estado do míssil 2 a desativado
 
-	MOV [POS_MISSIL_3], R3				; repõe linha missil 3 à linha inicial
-	MOV [POS_MISSIL_3+2], R2			; repõe coluna missil 3 à coluna inicial
+	MOV [POS_MISSIL_3], R3				; repõe linha míssil 3 à linha inicial
+	MOV [POS_MISSIL_3+2], R2			; repõe coluna míssil 3 à coluna inicial
 	MOV [POS_MISSIL_3+4], R4			; repõe estado do míssil 3 a desativado
 	RET
 
@@ -2442,7 +2442,7 @@ perde_jogo:
 	JMP fim_perde_jogo                      
 
 	testa_rapariga_2:
-	CALL desenha_rapariga        		 ; desenha rapariga
+	CALL desenha_rapariga        		; desenha rapariga
 
 	fim_perde_jogo:
 

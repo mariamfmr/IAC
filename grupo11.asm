@@ -27,7 +27,7 @@ LINHA_TEC  EQU 1                        ; 1ª linha a testar (0001b)
 MASCARA    EQU 0FH                      ; para isolar os bits de menor peso
 
 ; VALORES ASSOCIADOS AO TECLADO
-TECLA 		EQU -1                            ; valor inicial do valor da tecla
+TECLA 		EQU -1                           ; valor inicial do valor da tecla
 TECLA_0 	EQU 0							; valor da tecla 0
 TECLA_2 	EQU 2							; valor da tecla 2
 TECLA_5 	EQU 5							; valor da tecla 5
@@ -46,14 +46,14 @@ COLUNA_PERSONAGEM		EQU  15         ; coluna inicial da pesonagem
 LARGURA_PERSONAGEM		EQU	 20		    ; largura do desenho da personagem
 ALTURA_PERSONAGEM		EQU  11			; altura do desenho da personagem
 
-CINZENTO 		EQU 0                   ; 1ª cor possivel para a arma
-BRANCO 			EQU 1                   ; 2ª cor possivel para a arma
-VERMELHO		EQU 2					; 3ª cor possivel para a arma
+CINZENTO 				EQU 0          	; 1ª cor possivel para a arma
+BRANCO 					EQU 1           ; 2ª cor possivel para a arma
+VERMELHO				EQU				; 3ª cor possivel para a arma
 
-LINHA_ARMA		EQU	27                  ; linha inicial da arma
-COLUNA_ARMA		EQU	25                  ; coluna inicial da arma
-LARGURA_ARMA	EQU	9                   ; largura do desenho da arma
-ALTURA_ARMA		EQU	5                   ; altura do desenho da arma
+LINHA_ARMA				EQU	27          ; linha inicial da arma
+COLUNA_ARMA				EQU	25          ; coluna inicial da arma
+LARGURA_ARMA			EQU	9           ; largura do desenho da arma
+ALTURA_ARMA				EQU	5           ; altura do desenho da arma
 
 LINHA_BOMBA_ESQ			EQU	 0          ; linha inicial da bomba à direita
 COLUNA_BOMBA_ESQ		EQU	 2          ; coluna inicial da bomba à direita
@@ -67,21 +67,22 @@ COLUNA_BOMBA_MEIO		EQU	 30         ; coluna inicial da bomba no meio
 LARGURA_BOMBA		 	EQU	 4          ; largura do desenho da bomba
 ALTURA_BOMBA			EQU	 4          ; altura do desenho da bomba
 
-LIMITE_BOMBA 			EQU  3
+LIMITE_BOMBA 			EQU  3			; limites da bomba consoante largura
 
 LINHA_MISSIL		  	EQU  21 	    ; linha inicial do missil
 COLUNA_MISSIL		 	EQU  33 	    ; coluna inicial do missil
 LARGURA_MISSIL		 	EQU  1          ; largura do desenho do missil
 ALTURA_MISSIL		 	EQU  1          ; altura do desenho do missil
 ; VALOR ASSOCIADO AO ESTADO DO MISSIL
-DESATIVADO 				EQU -1
+DESATIVADO 				EQU -1			; estado desativado do missil
+
 ; VALORES ASSOCIADOS AOS LIMITES DAS BOMBAS COM O ECRÃ E COM A PERSONAGEM
-LIM_COL_PERSONAGEM_ESQ	EQU 34
-LIM_COL_ESQ	EQU 0
-LIM_COL_DIR	EQU	60
-LIM_LIN_PERSONAGEM_DIR EQU 18
-LIM_COL_PERSONAGEM_DIR EQU 20
-LIM_LIN_PERSONAGEM_MEIO EQU 17
+LIM_COL_PERSONAGEM_ESQ	EQU 34			; limite coluna bomba com personagem
+LIM_COL_PERSONAGEM_DIR EQU 20			; limite coluna bomba com personagem
+LIM_COL_ESQ	EQU 0						; limite coluna bomba com ecrã	
+LIM_COL_DIR	EQU	60						; limite coluna bomba com ecrã
+LIM_LIN_PERSONAGEM_DIR EQU 18			; limite linha bomba com personagem
+LIM_LIN_PERSONAGEM_MEIO EQU 17			; limite linha bomba com personagem
 
 ; VALORES ASSOCIADOS AO ESTADO DAS BOMBAS
 NAO_MINERAVEL			EQU  0			; valor associado às bombas não mineraveis
@@ -93,9 +94,9 @@ ESQUERDA				EQU 1
 MEIO					EQU 2
 ; VALORES ASSOCIADOS AOS LIMITES DO ECRÃ
 
-LIMITE_DIREITO 			EQU 64
-LIMITE_ESQUERDO 		EQU 0
-LIMITE_SUPERIOR			EQU -1
+LIMITE_DIREITO 			EQU 64			; limite direito das colunas do ecrã
+LIMITE_ESQUERDO 		EQU 0			; limite esquerdo das colunas do ecrã
+LIMITE_SUPERIOR			EQU -1			; limite superior das linhas do ecrã
 
 ; VALORES ASSOCIADOS AOS SONS
 SOM_PERSONAGEM		EQU 0               ; som quando muda personagem 
@@ -111,7 +112,18 @@ JOGO_ACABADO		EQU 0               ; estado de quando o jogo ainda não começou
 JOGO_EM_CURSO		EQU 1               ; estado enquanto o jogo está a decorrer
 JOGO_PAUSADO		EQU 2               ; estado de quando o jogo está pausado
 ;VALOR ASSOSSIADO À ENERGIA
-ENERGIA_INICIAL		EQU 100
+ENERGIA_INICIAL		EQU 100				; energia inicial da personagem
+
+; VALORES ASSICIADOS AOS CENÁRIOS DE JOGO
+
+CENARIO_JOGO 		EQU 0				; valor do cenário de jogo em curso
+
+CENARIO_INICIO		EQU 1				; valor do cenário de início
+
+CENARIO_PERDER 		EQU 2				; valor do cenário de perder
+
+CENARIO_PAUSADO		EQU 3				; valor do cenário de jogo pausado
+
 
 ; *********************************************************************************
 ; * Zona de Dados
@@ -423,7 +435,7 @@ inicio:
     MOV  [APAGA_AVISO], R1				; apaga o aviso de nenhum cenário 
                                         ; selecionado 
     MOV  [APAGA_ECRA], R1				; apaga todos os pixels já desenhados 
-	MOV	 R1, 1							; cenário de fundo número 0
+	MOV	 R1, CENARIO_INICIO				; cenário de fundo número 0
     MOV  [SELECIONA_CENARIO], R1		; seleciona o cenário de fundo inicial	
 
     EI0                         		; permite interrupções 0
@@ -491,7 +503,7 @@ chama_comando:
                                         ; a esse estado
 
 comandos_jogo_acabado:
-	MOV R7, SOM_TECLADO
+	MOV R7, SOM_TECLADO					; obtém som do teclado
 
 	MOV R1, TECLA_C				         
 	CMP R1, R0 							; compara tecla primida com a tecla C
@@ -506,7 +518,7 @@ testa_muda_personagem:
 	JMP muda_personagem					 ; se forem iguais, muda a personagem
 
 comandos_jogo_pausado:
-	MOV R7, SOM_TECLADO
+	MOV R7, SOM_TECLADO					; obtém som do teclado
 
 	MOV R1, TECLA_F  
 	CMP R1, R0                           ; compara tecla primida com a tecla F
@@ -522,21 +534,19 @@ testa_recomeca_jogo:
 	JMP recomeca_jogo					 ; se forem iguais, recomeca_jogo
 
 comandos_decorrer_jogo:
-	MOV R7, SOM_TECLADO
+	MOV R7, SOM_TECLADO					 ; obtém som do teclado
 
 	MOV R1, TECLA_0
 	CMP R1, R0							 ; compara a tecla com a tecla 0
 	JNZ testa_missil_direita
 	JMP atira_missil_esquerda			 ; se forem iguais, atira um missil
 										 ; para a esquerda	            
- 
  testa_missil_direita:
 	MOV R1, TECLA_2
 	CMP R1, R0							 ; compara a tecla com a tecla 2
 	JNZ testa_missil_cima
 	JMP atira_missil_direita			 ; se forem iguais, atira um missil
 										 ; para a direita
-
 testa_missil_cima:
 	MOV R1, TECLA_5
 	CMP R1, R0						     ; compara a tecla com a tecla 5
@@ -573,7 +583,8 @@ fim_chama_comando:
 	RET
 
 ; ******************************************************************************
-; rot_int_arma - Rotina da interrupção 0 (mudar cor da arma).
+; rot_int_arma - Rotina de atendimento da interrupção 1 em respeito ao 
+;				 relógio cor da arma.
 ;                Altera INT_ARMA para 1 quando há interrupção.
 ; ******************************************************************************
 rot_int_arma:
@@ -588,7 +599,8 @@ rot_int_arma:
 
     
 ; ******************************************************************************
-; rot_int_bombas - Rotina de atendimento da interrupção 1. 
+; rot_int_bombas - Rotina de atendimento da interrupção 1 em respeito ao
+;				   relógio bombas.
 ;			  	   Altera INT_BOMBAS para 1 quando há interrupção.
 ; ******************************************************************************
 rot_int_bombas:
@@ -602,7 +614,8 @@ rot_int_bombas:
     RFE
 
 ; ******************************************************************************
-; rot_int_missil - Rotina de atendimento da interrupção 2,
+; rot_int_missil - Rotina de atendimento da interrupção 2 em respeito ao
+;				 	relógio misseis.
 ;			       Altera INT_MISSIL para 1 quando há interrupção.
 ; ******************************************************************************
 rot_int_missil:
@@ -616,7 +629,8 @@ rot_int_missil:
     RFE
     
 ; ******************************************************************************
-; rot_int_energia - Rotina de atendimento da interrupção 3.
+; rot_int_energia - Rotina de atendimento da interrupção 3 em respeito ao
+;				    relógio energia.
 ;					Altera INT_ENERGIA para 1 quando há interrupção.
 ; ******************************************************************************
 rot_int_energia:
@@ -692,7 +706,7 @@ aumentar_energia:
     PUSH R0
     PUSH R1 
 	PUSH R7
-	MOV R7, SOM_TECLADO
+	MOV R7, SOM_ENERGIA
 	CALL reproduz_som
     MOV  R0, ENERGIA_PERSONAGEM         ; energia atual da personagem
     MOV  R0, [R0]              			; lê energia do da personagem
@@ -739,24 +753,24 @@ atualiza_energia:
     PUSH R2
     PUSH R3
     PUSH R4
-    MOV  R3, ENERGIA_PERSONAGEM         ; obtém energia da personagem
-    MOV  [R3], R0                       ; atualiza valor da energia
-    MOV  R1, 100                        ; primeiro valor do fator
-    MOV  R2, 10                         ; para dividir o fator
-    MOV  R3, 0                          ; valor a enviar para os displays
+    MOV  R3, ENERGIA_PERSONAGEM             ; obtém energia da personagem
+    MOV  [R3], R0                           ; atualiza valor da energia
+    MOV  R1, 100                            ; primeiro valor do fator
+    MOV  R2, 10                             ; para dividir o fator
+    MOV  R3, 0                              ; valor a enviar para os displays
 
-converte:                               ; converte o valor da energia 
-    MOV  R4, R0                         ; copia o valor
-    DIV  R4, R1                         ; divide o valor pelo fator
-    MOD  R0, R1                         ; o valor passa a ser o resto
-    DIV  R1, R2                         ; divide o fator
-    SHL  R3, 4                          ; desloca o valor a enviar
-    OR   R3, R4                         ; junta o novo dígito (4 bits)
-    CMP  R1, 0                          ; o fator ficou 0 após a divisão
-                                        ; ver se era 1 antes de ser dividido
-    JNZ  converte                       ; se não, continua a converter
-    MOV  R4, DISPLAYS                   ; endereço do periférico dos displays
-    MOV  [R4], R3                       ; escreve o valor convertido nos displays
+converte:                                   ; converte o valor da energia 
+    MOV  R4, R0                             ; copia o valor
+    DIV  R4, R1                             ; divide o valor pelo fator
+    MOD  R0, R1                             ; o valor passa a ser o resto
+    DIV  R1, R2                             ; divide o fator
+    SHL  R3, 4                              ; desloca o valor a enviar
+    OR   R3, R4                             ; junta o novo dígito (4 bits)
+    CMP  R1, 0                              ; o fator ficou 0 após a divisão
+                                            ; ver se era 1 antes de ser dividido
+    JNZ  converte                           ; se não, continua a converter
+    MOV  R4, DISPLAYS                 	    ; endereço do periférico dos displays
+    MOV  [R4], R3                           ; escreve o valor convertido nos displays
     POP  R4
     POP  R3
     POP  R2
@@ -771,28 +785,28 @@ muda_personagem:
 	PUSH R0
 	PUSH R1		
 	PUSH R5
-	MOV R0, [ESTADO_PERSONAGEM]         ; obtém personagem atual
+	MOV R0, [ESTADO_PERSONAGEM]  		    ; obtém personagem atual
 	MOV R1, RAPAZ   
-	CMP R1, R0                          ; verifica se é o rapaz
-	JZ muda_rapaz                       ; se sim, muda-o para a rapariga
-	MOV R7, SOM_PERSONAGEM		        ; som de mudar personagem
-	CALL reproduz_som                   ; reproduz som de mudar personagem
+	CMP R1, R0                  		    ; verifica se é o rapaz
+	JZ muda_rapaz              			    ; se sim, muda-o para a rapariga
+	MOV R7, SOM_PERSONAGEM			        ; som de mudar personagem
+	CALL reproduz_som           		    ; reproduz som de mudar personagem
 	
-muda_rapariga:                          ; muda a rapariga para o rapaz
-	CALL apaga_personagem               ; apaga personagem atual         
-	CALL desenha_rapaz                  ; desenha nova personagem (rapaz)
+muda_rapariga:                              ; muda a rapariga para o rapaz
+	CALL apaga_personagem                   ; apaga personagem atual         
+	CALL desenha_rapaz                		; desenha nova personagem (rapaz)
 	MOV R2, RAPAZ                       
-	MOV [ESTADO_PERSONAGEM], R2         ; atualiza estado da personagem
+	MOV [ESTADO_PERSONAGEM], R2        		; atualiza estado da personagem
 	POP R5
 	POP R1
 	POP R0
 	JMP fim_chama_comando
 
 muda_rapaz:
-	CALL apaga_personagem               ; apaga personagem atual
-	CALL desenha_rapariga               ; desenha nova personagem (rapariga)
+	CALL apaga_personagem              		; apaga personagem atual
+	CALL desenha_rapariga              		; desenha nova personagem (rapariga)
 	MOV R2, RAPARIGA
-	MOV [ESTADO_PERSONAGEM], R2         ; atualiza estado da personagem
+	MOV [ESTADO_PERSONAGEM], R2        	 	; atualiza estado da personagem
 	POP R3
 	POP R1
 	POP R0
@@ -868,6 +882,10 @@ procura_missil_parado:
 	PUSH R1
 	PUSH R3
 	PUSH R3
+	PUSH R7
+
+	MOV R7, SOM_MISSIL
+
 	MOV R1, -1								; estado parado a comparar
 	MOV R3, [POS_MISSIL_1+4]
 	CMP R1, R3								; compara estado atual do missil 1
@@ -890,20 +908,24 @@ procura_missil_parado:
 											; o fim do comando
 
 ativa_missil_1:
+	CALL reproduz_som						; reproduz som do missil disparado
 	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 1
 	MOV [POS_MISSIL_1+4], R5				; atualiza direção com valor escolhido
 	JMP fim_ativa_missil
 
 ativa_missil_2:
+	CALL reproduz_som						; reproduz som do missil disparado
 	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 2
 	MOV [POS_MISSIL_2+4], R5				; atualiza direção com valor escolhido
 	JMP fim_ativa_missil
 
 ativa_missil_3:
+	CALL reproduz_som						; reproduz som do missil disparado
 	CALL diminuir_energia_missil			; decrementa energia ao ativar míssil 3
 	MOV [POS_MISSIL_3+4], R5				; atualiza direção com valor escolhido
 
 fim_ativa_missil:
+	POP R7
 	POP R3
 	POP R2
 	POP R1
@@ -1445,7 +1467,7 @@ limites_direitos:						; limites de bombas que caminham
 	CMP R5, R2							; caso tenha ultrapassado,
 	JZ reset_bomba						; repõe a bomba
 	
-	MOV R5, LIM_LIN_PERSONAGEM_DIR		 ; testar choque com personagem
+	MOV R5, LIM_LIN_PERSONAGEM_DIR		; testar choque com personagem
 	CMP R5, R1							; ver se ultrapassou a linha da personagem
 	JNZ fim_limites_bomba				; se não, avança
 
@@ -1642,7 +1664,7 @@ comeca_jogo:
 	CALL desenha_bomba_2				; desenha bomba 2 no ecrã
 	CALL desenha_bomba_3				; desenha bomba 3 no ecrã
 	CALL desenha_bomba_4				; desenha bomba 4 no ecrã
-	MOV R1, 0
+	MOV R1, CENARIO_JOGO
 	MOV  [SELECIONA_CENARIO], R1        ; altera para cenário do jogo
 	POP R1
 	POP R4
@@ -1655,7 +1677,7 @@ comeca_jogo:
 recomeca_jogo:
 	PUSH R1
 	PUSH R4
-	MOV	 R1, 0						
+	MOV	 R1, CENARIO_JOGO					
     MOV  [SELECIONA_CENARIO], R1		; altera para o cenário de jogo
 	MOV R4, JOGO_EM_CURSO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para em curso
@@ -1669,7 +1691,7 @@ recomeca_jogo:
 pausa_jogo:
 	PUSH R1
 	PUSH R4
-	MOV	 R1, 3						
+	MOV	 R1, CENARIO_PAUSADO					
     MOV  [SELECIONA_CENARIO], R1		; seleciona o cenário de fundo inicial
 	MOV R4, JOGO_PAUSADO
 	MOV [ESTADO_JOGO], R4		        ; muda o estado de jogo para pausado
@@ -1709,8 +1731,8 @@ acaba_jogo:
 
 	fim_acaba_jogo:
 
-    MOV R1, 1							
-    MOV [SELECIONA_CENARIO], R1			; seleciona cenário fim de jogo	
+    MOV R1, CENARIO_INICIO							
+    MOV [SELECIONA_CENARIO], R1			; seleciona cenário início de jogo	
 	POP R4
 	POP R3
 	POP R2
@@ -2415,7 +2437,7 @@ perde_jogo:
 	MOV R0, [ESTADO_PERSONAGEM]         ; personagem atual
 	MOV R2, RAPAZ   
 	CMP R2, R0                          ; verifica se é o rapaz
-	JNE testa_rapariga_2            		; se não, desenha rapariga 
+	JNE testa_rapariga_2            	; se não, desenha rapariga 
 	CALL desenha_rapaz            		; se sim, desenha rapaz
 	JMP fim_perde_jogo                      
 
@@ -2424,8 +2446,8 @@ perde_jogo:
 
 	fim_perde_jogo:
 
-    MOV R1, 2                           ; muda o cenário para final de jogo
-                                        ; quando perdido
+    MOV R1, CENARIO_PERDER             	; muda o cenário para final de jogo
+                            
     MOV [SELECIONA_CENARIO], R1
 
 	MOV R7, SOM_PERDER

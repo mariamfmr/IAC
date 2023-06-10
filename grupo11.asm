@@ -788,9 +788,9 @@ muda_personagem:
 	MOV R0, [ESTADO_PERSONAGEM]  		    ; obtém personagem atual
 	MOV R1, RAPAZ   
 	CMP R1, R0                  		    ; verifica se é o rapaz
-	JZ muda_rapaz              			    ; se sim, muda-o para a rapariga
 	MOV R7, SOM_PERSONAGEM			        ; som de mudar personagem
 	CALL reproduz_som           		    ; reproduz som de mudar personagem
+	JZ muda_rapaz              			    ; se sim, muda-o para a rapariga
 	
 muda_rapariga:                              ; muda a rapariga para o rapaz
 	CALL apaga_personagem                   ; apaga personagem atual         

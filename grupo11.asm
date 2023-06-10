@@ -48,7 +48,7 @@ ALTURA_PERSONAGEM		EQU  11			; altura do desenho da personagem
 
 CINZENTO 				EQU 0          	; 1ª cor possivel para a arma
 BRANCO 					EQU 1           ; 2ª cor possivel para a arma
-VERMELHO				EQU				; 3ª cor possivel para a arma
+VERMELHO				EQU	2			; 3ª cor possivel para a arma
 
 LINHA_ARMA				EQU	27          ; linha inicial da arma
 COLUNA_ARMA				EQU	25          ; coluna inicial da arma

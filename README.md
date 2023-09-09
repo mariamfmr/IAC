@@ -17,4 +17,5 @@ Este jogo permite através do teclado:
 - E: trocar de personagem
 - F: acabar o jogo
 
+É importante observar que apesar do jogo estar completamente funcional, existem alguns pequenos erros de código presentes no código assembly do jogo. Esses erros, especificamente a falta de alguns POP's em certas rotinas, não afetam a jogabilidade do jogo, mas podem ser considerados como áreas de melhoria futura para aprimorar a robustez do código.
 
